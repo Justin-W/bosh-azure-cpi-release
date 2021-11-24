@@ -133,7 +133,7 @@ module Bosh::AzureCloud
 
     def _create_network_interfaces(resource_group_name, vm_name, location, vm_props, network_configurator, primary_nic_tags = AZURE_TAGS)
       # Tasks to prepare before creating NICs:
-      #   * preapre public ip
+      #   * prepare public ip
       #   * prepare load balancer
       #   * prepare application gateway
       tasks_preparing = []
