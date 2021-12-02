@@ -379,3 +379,6 @@ output "asg_name" {
 output "application_gateway_name" {
   value = azurerm_application_gateway.azure_application_gateway.name
 }
+output "application_gateway_backend_address_pool_name" {
+  value = azurerm_application_gateway.azure_application_gateway.backend_address_pool[0].name
+}
