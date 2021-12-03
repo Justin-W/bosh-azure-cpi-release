@@ -89,18 +89,18 @@ module Bosh::AzureCloud
     end
 
     # @return [Array<Hash>]
-    def _get_load_balancer(vm_props)
-      load_balancer = nil
+    def _get_load_balancers(vm_props)
+      load_balancers = nil
       unless vm_props.load_balancer.name.nil?
-        load_balancer_name_split = vm_props.load_balancer.name.split(',')        
-        load_balancer = Array.new
-        load_balancer_name_split.each do |load_balancer_name|
+        load_balancer_names = vm_props.load_balancer.name.split(',')
+        load_balancers = Array.new
+        load_balancer_names.each do |load_balancer_name|
           single_load_balancer = @azure_client.get_load_balancer_by_name(vm_props.load_balancer.resource_group_name, load_balancer_name)
           cloud_error("Cannot find the load balancer '#{load_balancer_name}'") if single_load_balancer.nil?
-          load_balancer.push(single_load_balancer)
+          load_balancers.push(single_load_balancer)
         end
       end
-      load_balancer
+      load_balancers
     end
 
     # @return [Hash]
@@ -147,7 +147,7 @@ module Bosh::AzureCloud
       )
       tasks_preparing.push(
         task_get_load_balancer = Concurrent::Future.execute do
-          _get_load_balancer(vm_props)
+          _get_load_balancers(vm_props)
         end
       )
       tasks_preparing.push(
