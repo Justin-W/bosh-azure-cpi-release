@@ -91,7 +91,7 @@ module Bosh::AzureCloud
     # @return [Array<Hash>]
     def _get_load_balancers(vm_props)
       load_balancers = nil
-      load_balancer_configs = vm_props.load_balancer
+      load_balancer_configs = vm_props.load_balancers
       unless load_balancer_configs.nil?
         load_balancers = load_balancer_configs.map do |load_balancer_config|
           single_load_balancer = @azure_client.get_load_balancer_by_name(load_balancer_config.resource_group_name, load_balancer_config.name)

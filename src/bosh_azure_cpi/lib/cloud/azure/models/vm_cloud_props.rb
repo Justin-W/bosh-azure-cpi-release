@@ -9,7 +9,7 @@ module Bosh::AzureCloud
     attr_reader :root_disk, :ephemeral_disk, :caching
     attr_reader :availability_zone
     attr_reader :availability_set
-    attr_reader :load_balancer
+    attr_reader :load_balancers
     attr_reader :application_gateway
     attr_reader :managed_identity
     attr_reader :security_group
@@ -56,7 +56,7 @@ module Bosh::AzureCloud
       @availability_set = _parse_availability_set_config(vm_properties, global_azure_config)
       cloud_error("Only one of 'availability_zone' and 'availability_set' is allowed to be configured for the VM but you have configured both.") if !@availability_zone.nil? && !@availability_set.name.nil?
 
-      @load_balancer = _parse_load_balancer_config(vm_properties, global_azure_config)
+      @load_balancers = _parse_load_balancer_config(vm_properties, global_azure_config)
       @application_gateway = vm_properties['application_gateway']
 
       @managed_identity = global_azure_config.default_managed_identity
