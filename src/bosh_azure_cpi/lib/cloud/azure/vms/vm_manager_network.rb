@@ -89,18 +89,18 @@ module Bosh::AzureCloud
     end
 
     # @return [Array<Hash>]
-    def _get_load_balancer(vm_props)
-      load_balancer = nil
+    def _get_load_balancers(vm_props)
+      load_balancers = nil
       unless vm_props.load_balancer.name.nil?
-        load_balancer_name_split = vm_props.load_balancer.name.split(',')        
-        load_balancer = Array.new
-        load_balancer_name_split.each do |load_balancer_name|
+        load_balancer_names = vm_props.load_balancer.name.split(',')
+        load_balancers = Array.new
+        load_balancer_names.each do |load_balancer_name|
           single_load_balancer = @azure_client.get_load_balancer_by_name(vm_props.load_balancer.resource_group_name, load_balancer_name)
           cloud_error("Cannot find the load balancer '#{load_balancer_name}'") if single_load_balancer.nil?
-          load_balancer.push(single_load_balancer)
+          load_balancers.push(single_load_balancer)
         end
       end
-      load_balancer
+      load_balancers
     end
 
     # @return [Hash]
@@ -146,8 +146,8 @@ module Bosh::AzureCloud
         end
       )
       tasks_preparing.push(
-        task_get_load_balancer = Concurrent::Future.execute do
-          _get_load_balancer(vm_props)
+        task_get_load_balancers = Concurrent::Future.execute do
+          _get_load_balancers(vm_props)
         end
       )
       tasks_preparing.push(
@@ -160,7 +160,7 @@ module Bosh::AzureCloud
       tasks_preparing.map(&:wait)
 
       public_ip = task_get_or_create_public_ip.value!
-      load_balancer = task_get_load_balancer.value!
+      load_balancers = task_get_load_balancers.value!
       application_gateway = task_get_application_gateway.value!
 
       # tasks to create NICs, NICs will be created in different threads
@@ -187,7 +187,7 @@ module Bosh::AzureCloud
         if index.zero?
           nic_params[:public_ip] = public_ip
           nic_params[:tags] = primary_nic_tags
-          nic_params[:load_balancer] = load_balancer
+          nic_params[:load_balancer] = load_balancers
           nic_params[:application_gateway] = application_gateway
         else
           nic_params[:public_ip] = nil
