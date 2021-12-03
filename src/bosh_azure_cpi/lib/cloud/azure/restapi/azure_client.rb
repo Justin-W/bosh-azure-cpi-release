@@ -2068,7 +2068,7 @@ module Bosh::AzureCloud
             end
             load_balancer
           end
-          interface[:load_balancer] = load_balancers
+          interface[:load_balancers] = load_balancers
         end
         unless ip_configuration_properties['applicationGatewayBackendAddressPools'].nil?
           if recursive
