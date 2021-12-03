@@ -1417,7 +1417,7 @@ module Bosh::AzureCloud
     # * +:dns_servers                   - Array. DNS servers.
     # * +:network_security_group        - Hash. The network security group which the network interface is bound to.
     # * +:application_security_groups   - Array. The application security groups which the network interface is bound to.
-    # * +:load_balancer                 - Array<Hash>. The load balancers which the network interface is bound to.
+    # * +:load_balancers                - Array<Hash>. The load balancers which the network interface is bound to.
     # * +:application_gateway           - Hash. The application gateway which the network interface is bound to.
     #
     # @return [Boolean]
@@ -1461,7 +1461,7 @@ module Bosh::AzureCloud
       end
       interface['properties']['ipConfigurations'][0]['properties']['applicationSecurityGroups'] = application_security_groups unless application_security_groups.empty?
 
-      load_balancer = nic_params[:load_balancer]
+      load_balancer = nic_params[:load_balancers]
       unless load_balancer.nil?
         backend_pools = load_balancer.collect { |single_load_balancer| {:id => single_load_balancer[:backend_address_pools][0][:id]} }
         inbound_nat_rules = Array.new
@@ -2058,6 +2058,7 @@ module Bosh::AzureCloud
                                   end
         end
         unless ip_configuration_properties['loadBalancerBackendAddressPools'].nil?
+          # TODO: issue-644: multi-LB: Review: Why does the code below only return 1 LB, when the code elsewhere sets 1+ LBs? Shouldn't it set `interface[:load_balancers] = ...` instead of `interface[:load_balancer] = ...`?
           if recursive
             names = _parse_name_from_id(ip_configuration_properties['loadBalancerBackendAddressPools'][0]['id'])
             interface[:load_balancer] = get_load_balancer_by_name(names[:resource_group_name], names[:resource_name])
