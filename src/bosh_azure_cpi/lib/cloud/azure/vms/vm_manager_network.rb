@@ -88,6 +88,7 @@ module Bosh::AzureCloud
       public_ip
     end
 
+    # @return [Array<Hash>]
     def _get_load_balancer(vm_props)
       load_balancer = nil
       unless vm_props.load_balancer.name.nil?
@@ -102,6 +103,7 @@ module Bosh::AzureCloud
       load_balancer
     end
 
+    # @return [Hash]
     def _get_application_gateway(vm_props)
       application_gateway = nil
       unless vm_props.application_gateway.nil?

@@ -1334,13 +1334,13 @@ module Bosh::AzureCloud
     # Network/Load Balancer
 
     # Get a load balancer's information
+    # @param [Object] resource_group_name
     # @param [String] name - Name of load balancer.
     #
     # @return [Hash]
     #
     # @See https://docs.microsoft.com/en-us/rest/api/load-balancer/loadbalancers/get
     #
-
     def get_load_balancer_by_name(resource_group_name, name)
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_LOAD_BALANCERS, resource_group_name: resource_group_name, name: name)
       _get_load_balancer(url)
@@ -1417,7 +1417,7 @@ module Bosh::AzureCloud
     # * +:dns_servers                   - Array. DNS servers.
     # * +:network_security_group        - Hash. The network security group which the network interface is bound to.
     # * +:application_security_groups   - Array. The application security groups which the network interface is bound to.
-    # * +:load_balancer                 - Hash. The load balancer which the network interface is bound to.
+    # * +:load_balancer                 - Array<Hash>. The load balancers which the network interface is bound to.
     # * +:application_gateway           - Hash. The application gateway which the network interface is bound to.
     #
     # @return [Boolean]
