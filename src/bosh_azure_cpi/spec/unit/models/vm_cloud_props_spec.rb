@@ -107,6 +107,7 @@ describe Bosh::AzureCloud::VMCloudProps do
         end
 
         it 'should return the correct config' do
+          expect(vm_cloud_props.load_balancers.length).to eq(1)
           load_balancer = vm_cloud_props.load_balancers.first
           expect(load_balancer.name).to eq(lb_name)
           expect(load_balancer.resource_group_name).to eq(resource_group_name)
@@ -126,6 +127,7 @@ describe Bosh::AzureCloud::VMCloudProps do
         end
 
         it 'should return the correct config' do
+          expect(vm_cloud_props.load_balancers.length).to eq(1)
           load_balancer = vm_cloud_props.load_balancers.first
           expect(load_balancer.name).to eq(lb_name)
           expect(load_balancer.resource_group_name).to eq(azure_config_managed.resource_group_name)
