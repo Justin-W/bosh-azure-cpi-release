@@ -99,6 +99,7 @@ module Bosh::AzureCloud
       end
     end
 
+    # @return [Bosh::AzureCloud::LoadBalancerConfig]
     def _parse_load_balancer_config(vm_properties, global_azure_config)
       if vm_properties[LOAD_BALANCER_KEY].is_a?(Hash)
         resource_group_name = vm_properties[LOAD_BALANCER_KEY][RESOURCE_GROUP_NAME_KEY] || global_azure_config.resource_group_name
@@ -114,6 +115,7 @@ module Bosh::AzureCloud
       end
     end
 
+    # @return [Bosh::AzureCloud::AvailabilitySetConfig]
     def _parse_availability_set_config(vm_properties, global_azure_config)
       if vm_properties[AVAILABILITY_SET_KEY].is_a?(Hash)
         platform_update_domain_count = vm_properties[AVAILABILITY_SET_KEY]['platform_update_domain_count'] || _default_update_domain_count(global_azure_config)
