@@ -2057,14 +2057,18 @@ module Bosh::AzureCloud
                                     { id: ip_configuration_properties['publicIPAddress']['id'] }
                                   end
         end
-        unless ip_configuration_properties['loadBalancerBackendAddressPools'].nil?
-          # TODO: issue-644: multi-LB: Review: Why does the code below only return 1 LB, when the code elsewhere sets 1+ LBs? Shouldn't it set `interface[:load_balancers] = ...` instead of `interface[:load_balancer] = ...`?
-          if recursive
-            names = _parse_name_from_id(ip_configuration_properties['loadBalancerBackendAddressPools'][0]['id'])
-            interface[:load_balancer] = get_load_balancer_by_name(names[:resource_group_name], names[:resource_name])
-          else
-            interface[:load_balancer] = { id: ip_configuration_properties['loadBalancerBackendAddressPools'][0]['id'] }
+        load_balancer_backend_pools = ip_configuration_properties['loadBalancerBackendAddressPools']
+        unless load_balancer_backend_pools.nil?
+          load_balancers = load_balancer_backend_pools.map do |lb_backend_pool|
+            if recursive
+              names = _parse_name_from_id(lb_backend_pool['id'])
+              load_balancer = get_load_balancer_by_name(names[:resource_group_name], names[:resource_name])
+            else
+              load_balancer = { id: lb_backend_pool['id'] }
+            end
+            load_balancer
           end
+          interface[:load_balancer] = load_balancers
         end
         unless ip_configuration_properties['applicationGatewayBackendAddressPools'].nil?
           if recursive
