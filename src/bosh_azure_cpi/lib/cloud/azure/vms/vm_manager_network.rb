@@ -91,12 +91,11 @@ module Bosh::AzureCloud
     # @return [Array<Hash>]
     def _get_load_balancers(vm_props)
       load_balancers = nil
-      unless vm_props.load_balancer.name.nil?
-        # TODO: issue-644: multi-LB: Review: Why does the `.split` happen here, instead of in `VMCloudProps._parse_availability_set_config`? Seems hacky.
-        load_balancer_names = vm_props.load_balancer.name.split(',')
-        load_balancers = load_balancer_names.map do |load_balancer_name|
-          single_load_balancer = @azure_client.get_load_balancer_by_name(vm_props.load_balancer.resource_group_name, load_balancer_name)
-          cloud_error("Cannot find the load balancer '#{load_balancer_name}'") if single_load_balancer.nil?
+      load_balancer_configs = vm_props.load_balancer
+      unless load_balancer_configs.nil?
+        load_balancers = load_balancer_configs.map do |load_balancer_config|
+          single_load_balancer = @azure_client.get_load_balancer_by_name(load_balancer_config.resource_group_name, load_balancer_config.name)
+          cloud_error("Cannot find the load balancer '#{load_balancer_config.name}'") if single_load_balancer.nil?
           single_load_balancer
         end
       end
