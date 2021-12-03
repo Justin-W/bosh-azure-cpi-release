@@ -99,7 +99,7 @@ module Bosh::AzureCloud
       end
     end
 
-    # @return [Bosh::AzureCloud::LoadBalancerConfig]
+    # @return [Array<Bosh::AzureCloud::LoadBalancerConfig>]
     def _parse_load_balancer_config(vm_properties, global_azure_config)
       load_balancer_config = vm_properties[LOAD_BALANCER_KEY]
       if load_balancer_config.is_a?(Hash)
@@ -109,11 +109,12 @@ module Bosh::AzureCloud
         load_balancer_names = load_balancer_config
         resource_group_name = nil
       end
-      # HACK: multi-LB: `load_balancer_names` can be a single LB's name, OR a comma-delimited list of such names. See the `VMManager._get_load_balancers` method. Seems like it would be cleaner to do the `.split` here instead of there.
-      Bosh::AzureCloud::LoadBalancerConfig.new(
-        resource_group_name || global_azure_config.resource_group_name,
-        load_balancer_names
-      )
+      String(load_balancer_names).split(',').map do |load_balancer_name|
+        Bosh::AzureCloud::LoadBalancerConfig.new(
+          resource_group_name || global_azure_config.resource_group_name,
+          load_balancer_name
+        )
+      end
     end
 
     # @return [Bosh::AzureCloud::AvailabilitySetConfig]
