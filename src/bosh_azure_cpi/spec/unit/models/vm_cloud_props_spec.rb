@@ -314,17 +314,46 @@ describe Bosh::AzureCloud::VMCloudProps do
     end
 
     context 'when application_gateway is a hash' do
-      let(:vm_cloud_properties) do
-        {
-          'application_gateway' => { 'name' => 'a' },
-          'instance_type' => 't'
-        }
+      let(:agw_name) { 'fake_agw_name' }
+
+      context 'when resource group not empty' do
+        let(:resource_group_name) { 'fake_resource_group' }
+        let(:vm_cloud_props) do
+          Bosh::AzureCloud::VMCloudProps.new(
+            {
+              'instance_type' => 'Standard_D1',
+              'application_gateway' => {
+                'name' => agw_name,
+                'resource_group_name' => resource_group_name
+              }
+            }, azure_config_managed
+          )
+        end
+
+        it 'should return the correct config' do
+          expect(vm_cloud_props.application_gateways.length).to eq(1)
+          application_gateway = vm_cloud_props.application_gateways.first
+          expect(application_gateway.name).to eq(agw_name)
+          expect(application_gateway.resource_group_name).to eq(resource_group_name)
+        end
       end
 
-      it 'should raise an error' do
-        expect do
-          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'application_gateway\' must be a String.')
+      context 'when resource group empty' do
+        let(:vm_cloud_props) do
+          Bosh::AzureCloud::VMCloudProps.new(
+            {
+              'instance_type' => 'Standard_D1',
+              'application_gateway' => { 'name' => agw_name }
+            }, azure_config_managed
+          )
+        end
+
+        it 'should return the correct config' do
+          expect(vm_cloud_props.application_gateways.length).to eq(1)
+          application_gateway = vm_cloud_props.application_gateways.first
+          expect(application_gateway.name).to eq(agw_name)
+          expect(application_gateway.resource_group_name).to be_nil
+        end
       end
     end
 
@@ -339,7 +368,7 @@ describe Bosh::AzureCloud::VMCloudProps do
       it 'should raise an error' do
         expect do
           Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'application_gateway\' must be a String.')
+        end.to raise_error('Property \'application_gateway\' must be a String or a Hash.')
       end
     end
 
@@ -354,7 +383,7 @@ describe Bosh::AzureCloud::VMCloudProps do
       it 'should raise an error' do
         expect do
           Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'application_gateway\' must be a String.')
+        end.to raise_error('Property \'application_gateway\' must be a String or a Hash.')
       end
     end
 
@@ -369,7 +398,7 @@ describe Bosh::AzureCloud::VMCloudProps do
       it 'should raise an error' do
         expect do
           Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'application_gateway\' must be a String.')
+        end.to raise_error('Property \'application_gateway\' must be a String or a Hash.')
       end
     end
 

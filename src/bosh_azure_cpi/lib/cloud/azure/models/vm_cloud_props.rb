@@ -135,9 +135,7 @@ module Bosh::AzureCloud
       return nil unless application_gateway_config
 
       # TODO: issue-644: multi-AGW: Support parsing 'application_gateway' property data as an Array (of Hash)
-      # TODO: issue-644: multi-AGW: Support parsing 'application_gateway' property data as a Hash
-      # cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String or a Hash.") unless application_gateway_config.is_a?(String) || application_gateway_config.is_a?(Hash)
-      cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String.") unless application_gateway_config.is_a?(String)
+      cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String or a Hash.") unless application_gateway_config.is_a?(String) || application_gateway_config.is_a?(Hash)
 
       if application_gateway_config.is_a?(Hash)
         application_gateway_names = application_gateway_config[NAME_KEY]
