@@ -279,6 +279,40 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
     end
 
+    context 'when application_gateway is not specified' do
+      let(:vm_cloud_props) do
+        Bosh::AzureCloud::VMCloudProps.new(
+          {
+            'instance_type' => 'Standard_D1'
+          }, azure_config_managed
+        )
+      end
+
+      it 'should return the correct config' do
+        expect(vm_cloud_props.application_gateway).to be_nil
+      end
+    end
+
+    context 'when application_gateway is a string' do
+      let(:agw_name) { 'fake_agw_name' }
+
+      let(:vm_cloud_props) do
+        Bosh::AzureCloud::VMCloudProps.new(
+          {
+            'instance_type' => 'Standard_D1',
+            'application_gateway' => agw_name
+          }, azure_config_managed
+        )
+      end
+
+      it 'should return the correct config' do
+        expect(vm_cloud_props.application_gateways.length).to eq(1)
+        application_gateway = vm_cloud_props.application_gateways.first
+        expect(application_gateway.name).to eq(agw_name)
+        expect(application_gateway.resource_group_name).to eq(azure_config_managed.resource_group_name)
+      end
+    end
+
     context 'when application_gateway is a hash' do
       let(:vm_cloud_properties) do
         {
