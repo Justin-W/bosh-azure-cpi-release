@@ -110,9 +110,8 @@ module Bosh::AzureCloud
         # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
         # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
         application_gateways = application_gateway_configs.map do |application_gateway_config|
-          application_gateway_name = application_gateway_config.name
-          application_gateway = @azure_client.get_application_gateway_by_name(application_gateway_name)
-          cloud_error("Cannot find the application gateway '#{application_gateway_name}'") if application_gateway.nil?
+          application_gateway = @azure_client.get_application_gateway_by_name(application_gateway_config.name, resource_group_name: application_gateway_config.resource_group_name)
+          cloud_error("Cannot find the application gateway '#{application_gateway_config.name}'") if application_gateway.nil?
           application_gateway
         end
       end
