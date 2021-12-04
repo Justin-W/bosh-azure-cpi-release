@@ -882,7 +882,7 @@ describe Bosh::AzureCloud::AzureClient do
             ip_configuration_id: 'fake-id',
             private_ip: '10.0.0.100',
             private_ip_allocation_method: 'Dynamic',
-            application_gateway: fake_application_gateway
+            application_gateways: [fake_application_gateway]
           }
         end
         it 'should return the network interface with application gateway' do

@@ -25,7 +25,7 @@ describe Bosh::AzureCloud::VMManager do
             .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
             .and_return(load_balancer)
           allow(azure_client).to receive(:get_application_gateway_by_name)
-            .with(vm_props.application_gateway)
+            .with(vm_props.application_gateways)
             .and_return(application_gateway)
           allow(azure_client).to receive(:list_public_ips)
             .and_return([{
@@ -52,7 +52,7 @@ describe Bosh::AzureCloud::VMManager do
             .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
             .and_return(load_balancer)
           allow(azure_client).to receive(:get_application_gateway_by_name)
-            .with(vm_props.application_gateway)
+            .with(vm_props.application_gateways)
             .and_return(application_gateway)
           allow(azure_client).to receive(:list_public_ips)
             .and_return([{
@@ -82,7 +82,7 @@ describe Bosh::AzureCloud::VMManager do
           .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
           .and_return(load_balancer)
         allow(azure_client).to receive(:get_application_gateway_by_name)
-          .with(vm_props.application_gateway)
+          .with(vm_props.application_gateways)
           .and_return(application_gateway)
         allow(azure_client).to receive(:list_public_ips)
           .and_return([{
@@ -131,7 +131,7 @@ describe Bosh::AzureCloud::VMManager do
           .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
           .and_return(load_balancer)
         allow(azure_client).to receive(:get_application_gateway_by_name)
-          .with(vm_props.application_gateway)
+          .with(vm_props.application_gateways)
           .and_return(application_gateway)
       end
 
@@ -216,7 +216,7 @@ describe Bosh::AzureCloud::VMManager do
           .and_return(load_balancer)
         # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
         allow(azure_client).to receive(:get_application_gateway_by_name)
-          .with(vm_props.application_gateway)
+          .with(vm_props.application_gateways)
           .and_return(nil)
 
         expect(azure_client).not_to receive(:delete_virtual_machine)
@@ -236,7 +236,7 @@ describe Bosh::AzureCloud::VMManager do
           .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
           .and_return(load_balancer)
         allow(azure_client).to receive(:get_application_gateway_by_name)
-          .with(vm_props.application_gateway)
+          .with(vm_props.application_gateways)
           .and_return(application_gateway)
         allow(azure_client).to receive(:list_public_ips)
           .and_return([{
@@ -280,7 +280,7 @@ describe Bosh::AzureCloud::VMManager do
             .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
             .and_return(load_balancer)
           allow(azure_client).to receive(:get_application_gateway_by_name)
-            .with(vm_props.application_gateway)
+            .with(vm_props.application_gateways)
             .and_return(application_gateway)
           allow(azure_client).to receive(:list_public_ips)
             .and_return([{
