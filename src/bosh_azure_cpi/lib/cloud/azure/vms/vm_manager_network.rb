@@ -202,12 +202,12 @@ module Bosh::AzureCloud
           nic_params[:public_ip] = public_ip
           nic_params[:tags] = primary_nic_tags
           nic_params[:load_balancers] = load_balancers
-          nic_params[:application_gateway] = application_gateways
+          nic_params[:application_gateways] = application_gateways
         else
           nic_params[:public_ip] = nil
           nic_params[:tags] = AZURE_TAGS
           nic_params[:load_balancers] = nil
-          nic_params[:application_gateway] = nil
+          nic_params[:application_gateways] = nil
         end
         tasks_creating.push(
           Concurrent::Future.execute do
