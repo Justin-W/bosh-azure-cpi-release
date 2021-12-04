@@ -99,9 +99,12 @@ module Bosh::AzureCloud
       end
     end
 
-    # @return [Array<Bosh::AzureCloud::LoadBalancerConfig>]
+    # @return [Array<Bosh::AzureCloud::LoadBalancerConfig>,nil]
     def _parse_load_balancer_config(vm_properties, global_azure_config)
       load_balancer_config = vm_properties[LOAD_BALANCER_KEY]
+
+      return nil unless load_balancer_config
+
       if load_balancer_config.is_a?(Hash)
         load_balancer_names = load_balancer_config[NAME_KEY]
         resource_group_name = load_balancer_config[RESOURCE_GROUP_NAME_KEY]
