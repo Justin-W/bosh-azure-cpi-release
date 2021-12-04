@@ -1483,7 +1483,7 @@ module Bosh::AzureCloud
       application_gateways = nic_params[:application_gateways]
       unless application_gateways.nil?
         # TODO: issue-644: multi-BEPool-AGW: Add support for multiple (named) ApplicationGateway Backend Address Pools
-        backend_pools = application_gateways.map { |application_gateway| {'id' => application_gateway[:backend_address_pools][0][:id]} }
+        backend_pools = application_gateways.map { |application_gateway| {:id => application_gateway[:backend_address_pools][0][:id]} }
         interface['properties']['ipConfigurations'][0]['properties']['applicationGatewayBackendAddressPools'] = backend_pools
       end
 
