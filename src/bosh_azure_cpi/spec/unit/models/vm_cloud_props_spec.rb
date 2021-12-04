@@ -217,6 +217,51 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
     end
 
+    context 'when load_balancer is an array of string' do
+      let(:vm_cloud_properties) do
+        {
+          'load_balancer' => ['a'],
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'load_balancer\' must be a String or a Hash.')
+      end
+    end
+
+    context 'when load_balancer is an array of hash' do
+      let(:vm_cloud_properties) do
+        {
+          'load_balancer' => [{ 'name' => 'a' }],
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'load_balancer\' must be a String or a Hash.')
+      end
+    end
+
+    context 'when load_balancer is an int' do
+      let(:vm_cloud_properties) do
+        {
+          'load_balancer' => 123,
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'load_balancer\' must be a String or a Hash.')
+      end
+    end
+
     context '#managed_identity' do
       context 'when default_managed_identity is not specified in global configurations' do
         context 'when managed_identity is not specified in vm_extensions' do

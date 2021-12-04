@@ -105,6 +105,9 @@ module Bosh::AzureCloud
 
       return nil unless load_balancer_config
 
+      # TODO: issue-644: multi-LB: Support Parsing 'load_balancer' property data as an Array (of Hash)?
+      cloud_error("Property '#{LOAD_BALANCER_KEY}' must be a String or a Hash.") unless load_balancer_config.is_a?(String) || load_balancer_config.is_a?(Hash)
+
       if load_balancer_config.is_a?(Hash)
         load_balancer_names = load_balancer_config[NAME_KEY]
         resource_group_name = load_balancer_config[RESOURCE_GROUP_NAME_KEY]
