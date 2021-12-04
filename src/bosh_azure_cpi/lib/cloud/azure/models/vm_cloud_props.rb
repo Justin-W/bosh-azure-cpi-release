@@ -10,8 +10,7 @@ module Bosh::AzureCloud
     attr_reader :availability_zone
     attr_reader :availability_set
     attr_reader :load_balancers
-    # TODO: issue-644: multi-AGW: Rename the `@application_gateway` attribute.
-    attr_reader :application_gateway
+    attr_reader :application_gateways
     attr_reader :managed_identity
     attr_reader :security_group
     attr_reader :application_security_groups
@@ -60,8 +59,7 @@ module Bosh::AzureCloud
 
       @load_balancers = _parse_load_balancer_config(vm_properties, global_azure_config)
 
-      # TODO: issue-644: multi-AGW: Rename the `@application_gateway` attribute.
-      @application_gateway = _parse_application_gateway_config(vm_properties, global_azure_config)
+      @application_gateways = _parse_application_gateway_config(vm_properties, global_azure_config)
 
       @managed_identity = global_azure_config.default_managed_identity
       managed_identity_hash = vm_properties.fetch('managed_identity', nil)

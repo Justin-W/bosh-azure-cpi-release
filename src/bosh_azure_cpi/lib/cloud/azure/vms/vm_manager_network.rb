@@ -104,12 +104,11 @@ module Bosh::AzureCloud
 
     # @return [Hash]
     def _get_application_gateway(vm_props)
-      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
-      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
-      # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
       application_gateway = nil
-      unless vm_props.application_gateway.nil?
-        application_gateway_name = vm_props.application_gateway
+      unless vm_props.application_gateways.nil?
+        # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
+        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
+        application_gateway_name = vm_props.application_gateways.first.name
         application_gateway = @azure_client.get_application_gateway_by_name(application_gateway_name)
         cloud_error("Cannot find the application gateway '#{application_gateway_name}'") if application_gateway.nil?
       end

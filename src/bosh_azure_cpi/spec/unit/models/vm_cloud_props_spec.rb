@@ -289,7 +289,7 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
 
       it 'should return the correct config' do
-        expect(vm_cloud_props.application_gateway).to be_nil
+        expect(vm_cloud_props.application_gateways).to be_nil
       end
     end
 
