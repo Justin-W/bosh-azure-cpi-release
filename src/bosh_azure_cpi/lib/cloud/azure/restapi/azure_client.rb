@@ -1424,7 +1424,7 @@ module Bosh::AzureCloud
     # * +:network_security_group        - Hash. The network security group which the network interface is bound to.
     # * +:application_security_groups   - Array. The application security groups which the network interface is bound to.
     # * +:load_balancers                - Array<Hash>. The load balancers which the network interface is bound to.
-    # * +:application_gateway           - Hash. The application gateway which the network interface is bound to.
+    # * +:application_gateways          - Array<Hash>. The application gateways which the network interface is bound to.
     #
     # @return [Boolean]
     #
@@ -1483,12 +1483,12 @@ module Bosh::AzureCloud
       end
 
       # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
-      application_gateway = nic_params[:application_gateway]
-      unless application_gateway.nil?
+      application_gateways = nic_params[:application_gateways]
+      unless application_gateways.nil?
         # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
         interface['properties']['ipConfigurations'][0]['properties']['applicationGatewayBackendAddressPools'] = [
           {
-            'id' => application_gateway[:backend_address_pools][0][:id]
+            'id' => application_gateways[:backend_address_pools][0][:id]
           }
         ]
       end
