@@ -90,6 +90,20 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
     end
 
+    context 'when load_balancer is not specified' do
+      let(:vm_cloud_props) do
+        Bosh::AzureCloud::VMCloudProps.new(
+          {
+            'instance_type' => 'Standard_D1'
+          }, azure_config_managed
+        )
+      end
+
+      it 'should return the correct config' do
+        expect(vm_cloud_props.load_balancers).to be_nil
+      end
+    end
+
     context 'when load_balancer is a string' do
       let(:lb_name) { 'fake_lb_name' }
 
