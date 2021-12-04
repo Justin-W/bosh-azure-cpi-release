@@ -102,17 +102,21 @@ module Bosh::AzureCloud
       load_balancers
     end
 
-    # @return [Hash]
-    def _get_application_gateway(vm_props)
-      application_gateway = nil
-      unless vm_props.application_gateways.nil?
+    # @return [Array<Hash>]
+    def _get_application_gateways(vm_props)
+      application_gateways = nil
+      application_gateway_configs = vm_props.application_gateways
+      unless application_gateway_configs.nil?
         # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
         # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
-        application_gateway_name = vm_props.application_gateways.first.name
-        application_gateway = @azure_client.get_application_gateway_by_name(application_gateway_name)
-        cloud_error("Cannot find the application gateway '#{application_gateway_name}'") if application_gateway.nil?
+        application_gateways = application_gateway_configs.map do |application_gateway_config|
+          application_gateway_name = application_gateway_config.name
+          application_gateway = @azure_client.get_application_gateway_by_name(application_gateway_name)
+          cloud_error("Cannot find the application gateway '#{application_gateway_name}'") if application_gateway.nil?
+          application_gateway
+        end
       end
-      application_gateway
+      application_gateways
     end
 
     def _get_or_create_public_ip(resource_group_name, vm_name, location, vm_props, network_configurator)
@@ -155,7 +159,7 @@ module Bosh::AzureCloud
       )
       tasks_preparing.push(
         task_get_application_gateway = Concurrent::Future.execute do
-          _get_application_gateway(vm_props)
+          _get_application_gateways(vm_props)
         end
       )
 
