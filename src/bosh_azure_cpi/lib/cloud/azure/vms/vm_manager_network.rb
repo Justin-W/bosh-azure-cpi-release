@@ -158,7 +158,7 @@ module Bosh::AzureCloud
         end
       )
       tasks_preparing.push(
-        task_get_application_gateway = Concurrent::Future.execute do
+        task_get_application_gateways = Concurrent::Future.execute do
           _get_application_gateways(vm_props)
         end
       )
@@ -168,7 +168,7 @@ module Bosh::AzureCloud
 
       public_ip = task_get_or_create_public_ip.value!
       load_balancers = task_get_load_balancers.value!
-      application_gateway = task_get_application_gateway.value!
+      application_gateways = task_get_application_gateways.value!
 
       # tasks to create NICs, NICs will be created in different threads
       tasks_creating = []
@@ -202,7 +202,7 @@ module Bosh::AzureCloud
           nic_params[:public_ip] = public_ip
           nic_params[:tags] = primary_nic_tags
           nic_params[:load_balancers] = load_balancers
-          nic_params[:application_gateway] = application_gateway
+          nic_params[:application_gateway] = application_gateways
         else
           nic_params[:public_ip] = nil
           nic_params[:tags] = AZURE_TAGS
