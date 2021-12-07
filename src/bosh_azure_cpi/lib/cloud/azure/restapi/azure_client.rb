@@ -1340,14 +1340,14 @@ module Bosh::AzureCloud
     # Network/Load Balancer
 
     # Get a load balancer's information
+    # @param [String,nil] resource_group_name - The load balancer's resource group name.
     # @param [String] name - Name of load balancer.
-    # @param [String,nil] resource_group_name - (Optional) The load balancer's resource group name.
     #
     # @return [Hash]
     #
     # @See https://docs.microsoft.com/en-us/rest/api/load-balancer/loadbalancers/get
     #
-    def get_load_balancer_by_name(name, resource_group_name: nil)
+    def get_load_balancer_by_name(resource_group_name, name)
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_LOAD_BALANCERS, resource_group_name: resource_group_name, name: name)
       _get_load_balancer(url)
     end
@@ -2072,7 +2072,7 @@ module Bosh::AzureCloud
           load_balancers = load_balancer_backend_pools.map do |lb_backend_pool|
             if recursive
               names = _parse_name_from_id(lb_backend_pool['id'])
-              load_balancer = get_load_balancer_by_name(names[:resource_name], resource_group_name: names[:resource_group_name])
+              load_balancer = get_load_balancer_by_name(names[:resource_group_name], names[:resource_name])
             else
               load_balancer = { id: lb_backend_pool['id'] }
             end
