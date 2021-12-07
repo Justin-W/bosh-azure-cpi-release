@@ -1625,14 +1625,14 @@ module Bosh::AzureCloud
     # Network/Application Gateway
 
     # Get an application gateway's information
+    # @param [String,nil] resource_group_name - The application gateway's resource group name.
     # @param [String] name - Name of application gateway.
-    # @param [String,nil] resource_group_name - (Optional) The application gateway's resource group name.
     #
     # @return [Hash]
     #
     # @See https://docs.microsoft.com/en-us/rest/api/application-gateway/applicationgateways/get
     #
-    def get_application_gateway_by_name(name, resource_group_name: nil)
+    def get_application_gateway_by_name(resource_group_name, name)
       # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_APPLICATION_GATEWAYS, resource_group_name: resource_group_name, name: name)
       get_application_gateway(url)
@@ -2085,7 +2085,7 @@ module Bosh::AzureCloud
           application_gateways = application_gateway_backend_pools.map do |agw_backend_pool|
             if recursive
               names = _parse_name_from_id(agw_backend_pool['id'])
-              application_gateway = get_application_gateway_by_name(names[:resource_name], resource_group_name: names[:resource_group_name])
+              application_gateway = get_application_gateway_by_name(names[:resource_group_name], names[:resource_name])
             else
               application_gateway = { id: agw_backend_pool['id'] }
             end

@@ -657,7 +657,7 @@ describe Bosh::AzureCloud::AzureClient do
           headers: {}
         )
         expect(
-          azure_client.get_application_gateway_by_name(application_gateway_name)
+          azure_client.get_application_gateway_by_name(nil, application_gateway_name)
         ).to be_nil
       end
 
@@ -674,7 +674,7 @@ describe Bosh::AzureCloud::AzureClient do
             headers: {}
           )
           expect(
-            azure_client.get_application_gateway_by_name(application_gateway_name)
+            azure_client.get_application_gateway_by_name(nil, application_gateway_name)
           ).to eq(fake_application_gateway)
         end
       end
@@ -692,7 +692,7 @@ describe Bosh::AzureCloud::AzureClient do
             headers: {}
           )
           expect(
-            azure_client.get_application_gateway_by_name(application_gateway_name, resource_group_name: default_resource_group_name)
+            azure_client.get_application_gateway_by_name(default_resource_group_name, application_gateway_name)
           ).to eq(fake_application_gateway)
         end
       end
