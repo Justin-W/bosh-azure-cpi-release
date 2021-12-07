@@ -59,7 +59,7 @@ describe Bosh::AzureCloud::VMManager do
         .and_return(vm_name)
 
       allow(azure_client).to receive(:get_load_balancer_by_name)
-        .with(resource_group_name, vm_name)
+        .with(vm_name, resource_group_name: resource_group_name)
         .and_return(load_balancer)
       # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
       # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
