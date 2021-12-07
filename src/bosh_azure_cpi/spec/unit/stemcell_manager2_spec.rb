@@ -63,7 +63,7 @@ describe Bosh::AzureCloud::StemcellManager2 do
     end
 
     context 'when use_default_account_for_cleaning is false' do
-      it 'deletes the stemcell in default storage account' do
+      it 'deletes all stemcells with the given stemcell name in all storage accounts' do
         # Delete the user images whose prefix is the stemcell_uuid or stemcell_name
         expect(azure_client).to receive(:delete_user_image)
           .with("#{stemcell_uuid}-postfix").once
