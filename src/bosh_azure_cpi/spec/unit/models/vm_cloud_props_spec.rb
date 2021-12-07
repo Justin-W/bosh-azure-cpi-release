@@ -309,7 +309,7 @@ describe Bosh::AzureCloud::VMCloudProps do
         expect(vm_cloud_props.application_gateways.length).to eq(1)
         application_gateway = vm_cloud_props.application_gateways.first
         expect(application_gateway.name).to eq(agw_name)
-        expect(application_gateway.resource_group_name).to eq(azure_config_managed.resource_group_name)
+        expect(application_gateway.resource_group_name).to be_nil
       end
     end
 

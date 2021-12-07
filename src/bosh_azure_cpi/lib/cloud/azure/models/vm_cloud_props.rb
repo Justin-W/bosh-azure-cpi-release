@@ -59,7 +59,7 @@ module Bosh::AzureCloud
 
       @load_balancers = _parse_load_balancer_config(vm_properties, global_azure_config)
 
-      @application_gateways = _parse_application_gateway_config(vm_properties, global_azure_config)
+      @application_gateways = _parse_application_gateway_config(vm_properties)
 
       @managed_identity = global_azure_config.default_managed_identity
       managed_identity_hash = vm_properties.fetch('managed_identity', nil)
@@ -129,7 +129,7 @@ module Bosh::AzureCloud
     end
 
     # @return [Array<Bosh::AzureCloud::ApplicationGatewayConfig>,nil]
-    def _parse_application_gateway_config(vm_properties, global_azure_config)
+    def _parse_application_gateway_config(vm_properties)
       application_gateway_config = vm_properties[APPLICATION_GATEWAY_KEY]
 
       return nil unless application_gateway_config
@@ -148,7 +148,9 @@ module Bosh::AzureCloud
       end
       String(application_gateway_names).split(',').map do |application_gateway_name|
         Bosh::AzureCloud::ApplicationGatewayConfig.new(
-          resource_group_name || global_azure_config.resource_group_name,
+          # NOTE: It is OK for the resource_group_name to be `nil` here. The nil will be defaulted elsewhere (if needed). And leaving it nil makes the specs simpler.
+          # resource_group_name || global_azure_config.resource_group_name,
+          resource_group_name,
           application_gateway_name
         )
       end
