@@ -134,24 +134,27 @@ module Bosh::AzureCloud
 
       return nil unless application_gateway_config
 
-      # TODO: issue-644: multi-AGW: Support parsing 'application_gateway' property data as an Array (of Hash)
-      cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String or a Hash.") unless application_gateway_config.is_a?(String) || application_gateway_config.is_a?(Hash)
+      cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String, Hash, or Array.") unless application_gateway_config.is_a?(String) || application_gateway_config.is_a?(Hash) || application_gateway_config.is_a?(Array)
 
-      if application_gateway_config.is_a?(Hash)
-        application_gateway_names = application_gateway_config[NAME_KEY]
-        resource_group_name = application_gateway_config[RESOURCE_GROUP_NAME_KEY]
-      else
-        application_gateway_names = application_gateway_config
-        resource_group_name = nil
+      application_gateway_configs = application_gateway_config.is_a?(Array) ? application_gateway_config : [application_gateway_config]
+      application_gateways = Array(application_gateway_configs).flat_map do |agwc|
+        if agwc.is_a?(Hash)
+          application_gateway_names = agwc[NAME_KEY]
+          resource_group_name = agwc[RESOURCE_GROUP_NAME_KEY]
+        else
+          application_gateway_names = agwc
+          resource_group_name = nil
+        end
+        String(application_gateway_names).split(',').map do |application_gateway_name|
+          Bosh::AzureCloud::ApplicationGatewayConfig.new(
+            # NOTE: It is OK for the resource_group_name to be `nil` here. The nil will be defaulted elsewhere (if needed). And leaving it nil makes the specs simpler.
+            # resource_group_name || global_azure_config.resource_group_name,
+            resource_group_name,
+            application_gateway_name
+          )
+        end
       end
-      String(application_gateway_names).split(',').map do |application_gateway_name|
-        Bosh::AzureCloud::ApplicationGatewayConfig.new(
-          # NOTE: It is OK for the resource_group_name to be `nil` here. The nil will be defaulted elsewhere (if needed). And leaving it nil makes the specs simpler.
-          # resource_group_name || global_azure_config.resource_group_name,
-          resource_group_name,
-          application_gateway_name
-        )
-      end
+      application_gateways.compact
     end
 
     # @return [Bosh::AzureCloud::AvailabilitySetConfig]
