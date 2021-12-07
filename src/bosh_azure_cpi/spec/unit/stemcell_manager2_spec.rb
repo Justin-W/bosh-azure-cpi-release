@@ -13,9 +13,6 @@ describe Bosh::AzureCloud::StemcellManager2 do
   before do
     allow(storage_account_manager).to receive(:default_storage_account_name)
       .and_return(MOCK_DEFAULT_STORAGE_ACCOUNT_NAME)
-
-    allow(storage_account_manager).to receive(:use_default_account_for_cleaning)
-      .and_return(false)
   end
 
   let(:stemcell_uuid) { 'fbb636e9-89b6-432b-b52c-b5cd93654900' }
@@ -63,6 +60,11 @@ describe Bosh::AzureCloud::StemcellManager2 do
     end
 
     context 'when use_default_account_for_cleaning is false' do
+      before do
+        allow(storage_account_manager).to receive(:use_default_account_for_cleaning)
+          .and_return(false)
+      end
+
       it 'deletes all stemcells with the given stemcell name in all storage accounts' do
         # Delete the user images whose prefix is the stemcell_uuid or stemcell_name
         expect(azure_client).to receive(:delete_user_image)
@@ -78,6 +80,17 @@ describe Bosh::AzureCloud::StemcellManager2 do
 
         stemcell_manager2.delete_stemcell(stemcell_name)
       end
+    end
+
+    # TODO: coverage: need to implement the following specs to increase coverage
+    #   The uncovered code seems to be related to PR #616.
+    context 'when use_default_account_for_cleaning is true' do
+      before do
+        allow(storage_account_manager).to receive(:use_default_account_for_cleaning)
+          .and_return(true)
+      end
+
+      it 'deletes the stemcell in default storage account'
     end
   end
 
