@@ -85,6 +85,11 @@ Lint/UnmodifiedReduceAccumulator: # new in 1.1
 Lint/UselessRuby2Keywords: # new in 1.23
   Enabled: true
 
+Metrics/BlockLength:
+  Exclude:
+    #- '**/*_spec.rb'
+    - 'spec/unit/azure_client/get_operation_spec.rb'
+
 RSpec/ExcessiveDocstringSpacing: # new in 2.5
   Enabled: true
 
