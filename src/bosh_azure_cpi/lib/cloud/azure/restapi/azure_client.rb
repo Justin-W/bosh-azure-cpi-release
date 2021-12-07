@@ -2085,7 +2085,7 @@ module Bosh::AzureCloud
         unless ip_configuration_properties['applicationGatewayBackendAddressPools'].nil?
           if recursive
             names = _parse_name_from_id(ip_configuration_properties['applicationGatewayBackendAddressPools'][0]['id'])
-            interface[:application_gateway] = get_application_gateway_by_name(names[:resource_name])
+            interface[:application_gateway] = get_application_gateway_by_name(names[:resource_name], resource_group_name: names[:resource_group_name])
           else
             interface[:application_gateway] = { id: ip_configuration_properties['applicationGatewayBackendAddressPools'][0]['id'] }
           end
