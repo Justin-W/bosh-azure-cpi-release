@@ -22,7 +22,7 @@ module Bosh::AzureCloud
     end
   end
 
-  class AzureClient
+  class AzureClient # rubocop:disable Metrics/ClassLength
     include Helpers
 
     HTTP_CODE_OK                  = 200
