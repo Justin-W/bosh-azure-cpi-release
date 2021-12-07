@@ -105,22 +105,25 @@ module Bosh::AzureCloud
 
       return nil unless load_balancer_config
 
-      # TODO: issue-644: multi-LB: Support Parsing 'load_balancer' property data as an Array (of Hash)?
-      cloud_error("Property '#{LOAD_BALANCER_KEY}' must be a String or a Hash.") unless load_balancer_config.is_a?(String) || load_balancer_config.is_a?(Hash)
+      cloud_error("Property '#{LOAD_BALANCER_KEY}' must be a String, Hash, or Array.") unless load_balancer_config.is_a?(String) || load_balancer_config.is_a?(Hash) || load_balancer_config.is_a?(Array)
 
-      if load_balancer_config.is_a?(Hash)
-        load_balancer_names = load_balancer_config[NAME_KEY]
-        resource_group_name = load_balancer_config[RESOURCE_GROUP_NAME_KEY]
-      else
-        load_balancer_names = load_balancer_config
-        resource_group_name = nil
+      load_balancer_configs = load_balancer_config.is_a?(Array) ? load_balancer_config : [load_balancer_config]
+      load_balancers = Array(load_balancer_configs).flat_map do |lbc|
+        if lbc.is_a?(Hash)
+          load_balancer_names = lbc[NAME_KEY]
+          resource_group_name = lbc[RESOURCE_GROUP_NAME_KEY]
+        else
+          load_balancer_names = lbc
+          resource_group_name = nil
+        end
+        String(load_balancer_names).split(',').map do |load_balancer_name|
+          Bosh::AzureCloud::LoadBalancerConfig.new(
+            resource_group_name || global_azure_config.resource_group_name,
+            load_balancer_name
+          )
+        end
       end
-      String(load_balancer_names).split(',').map do |load_balancer_name|
-        Bosh::AzureCloud::LoadBalancerConfig.new(
-          resource_group_name || global_azure_config.resource_group_name,
-          load_balancer_name
-        )
-      end
+      load_balancers.compact
     end
 
     # @return [Bosh::AzureCloud::AvailabilitySetConfig]

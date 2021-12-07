@@ -217,33 +217,50 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
     end
 
-    context 'when load_balancer is an array of string' do
-      let(:vm_cloud_properties) do
-        {
-          'load_balancer' => ['a'],
-          'instance_type' => 't'
-        }
+    context 'when load_balancer is an array' do
+      let(:resource_group_name) { 'fake_resource_group' }
+
+      let(:vm_cloud_props) do
+        Bosh::AzureCloud::VMCloudProps.new(
+          {
+            'instance_type' => 'Standard_D1',
+            'load_balancer' => [
+              'fake_lb1_name', # String
+              {
+                'name' => 'fake_lb2_name'
+                # 'resource_group_name' => resource_group_name
+              }, # Hash without resource_group_name
+              'fake_lb3_name,fake_lb4_name', # delimited String
+              {
+                'name' => 'fake_lb5_name,fake_lb6_name',
+                'resource_group_name' => resource_group_name
+              } # Hash with delimited String and explicit resource_group_name
+            ]
+          }, azure_config_managed
+        )
       end
 
-      it 'should raise an error' do
-        expect do
-          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'load_balancer\' must be a String or a Hash.')
-      end
-    end
+      it 'should return the correct config' do
+        load_balancers = vm_cloud_props.load_balancers
+        expect(load_balancers.length).to eq(6)
 
-    context 'when load_balancer is an array of hash' do
-      let(:vm_cloud_properties) do
-        {
-          'load_balancer' => [{ 'name' => 'a' }],
-          'instance_type' => 't'
-        }
-      end
+        expect(load_balancers[0].name).to eq('fake_lb1_name')
+        expect(load_balancers[0].resource_group_name).to eq(azure_config_managed.resource_group_name)
 
-      it 'should raise an error' do
-        expect do
-          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'load_balancer\' must be a String or a Hash.')
+        expect(load_balancers[1].name).to eq('fake_lb2_name')
+        expect(load_balancers[1].resource_group_name).to eq(azure_config_managed.resource_group_name)
+
+        expect(load_balancers[2].name).to eq('fake_lb3_name')
+        expect(load_balancers[2].resource_group_name).to eq(azure_config_managed.resource_group_name)
+
+        expect(load_balancers[3].name).to eq('fake_lb4_name')
+        expect(load_balancers[3].resource_group_name).to eq(azure_config_managed.resource_group_name)
+
+        expect(load_balancers[4].name).to eq('fake_lb5_name')
+        expect(load_balancers[4].resource_group_name).to eq(resource_group_name)
+
+        expect(load_balancers[5].name).to eq('fake_lb6_name')
+        expect(load_balancers[5].resource_group_name).to eq(resource_group_name)
       end
     end
 
@@ -258,7 +275,7 @@ describe Bosh::AzureCloud::VMCloudProps do
       it 'should raise an error' do
         expect do
           Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
-        end.to raise_error('Property \'load_balancer\' must be a String or a Hash.')
+        end.to raise_error('Property \'load_balancer\' must be a String, Hash, or Array.')
       end
     end
 
