@@ -33,6 +33,24 @@ describe Bosh::AzureCloud::BoshAgentUtil do
     allow(config).to receive(:agent).and_return({'mbus' => 'http://u:p@somewhere'})
   end
 
+  # TODO: coverage: need to implement the following specs to increase coverage
+  #   The uncovered code seems to be related to commit #c38b3026f9512491ffcb70be7088b4d3e319fdc0 (for issue #491).
+  describe '#encoded_user_data' do # rubocop:disable RSpec/RepeatedExampleGroupBody
+    it 'should return correct value'
+  end
+
+  # TODO: coverage: need to implement the following specs to increase coverage
+  #   The uncovered code seems to be related to commit #c38b3026f9512491ffcb70be7088b4d3e319fdc0 (for issue #491).
+  describe '#encode_user_data' do # rubocop:disable RSpec/RepeatedExampleGroupBody
+    it 'should return correct value'
+  end
+
+  # TODO: coverage: need to implement the following specs to increase coverage
+  #   The uncovered code seems to be related to commit #c38b3026f9512491ffcb70be7088b4d3e319fdc0 (for issue #491).
+  describe '#meta_data_obj' do # rubocop:disable RSpec/RepeatedExampleGroupBody
+    it 'should return correct value'
+  end
+
   describe '#user_data_obj' do
     context 'when using registry' do
       let(:uses_registry) { true }
@@ -105,6 +123,12 @@ describe Bosh::AzureCloud::BoshAgentUtil do
 
         expect(user_data).to eq(expected_user_data)
       end
+    end
+
+    # TODO: coverage: need to implement the following specs to increase coverage
+    #   The uncovered code seems to be related to commit #c38b3026f9512491ffcb70be7088b4d3e319fdc0 (for issue #491).
+    context 'when computer_name is specified' do
+      it 'should include the instance-id in the returned value'
     end
   end
 end
