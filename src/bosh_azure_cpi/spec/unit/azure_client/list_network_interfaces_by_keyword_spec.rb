@@ -26,6 +26,28 @@ describe Bosh::AzureCloud::AzureClient do
   let(:valid_access_token) { 'valid-access-token' }
   let(:expires_on) { (Time.new + 1800).to_i.to_s }
 
+  describe '#get_resources_by_url' do
+    context 'when url is valid' do
+      context 'when response body empty' do
+        it 'should return nil'
+      end
+
+      context 'when response body not empty' do
+        it 'should return correct value'
+
+        # TODO: coverage: need to implement the following specs to increase coverage
+        #   PR #610 (for issue #603) added some uncovered code.
+        context 'when response body contains a nextLink' do
+          it 'should merge the multi-part response into a single value'
+        end
+      end
+    end
+
+    context 'when url is invalid' do
+      it 'should raise an error'
+    end
+  end
+
   describe '#list_network_interfaces_by_keyword' do
     let(:network_interfaces_url) { "https://management.azure.com/subscriptions/#{subscription_id}/resourceGroups/#{resource_group}/providers/Microsoft.Network/networkInterfaces?api-version=#{api_version_network}" }
     let(:instance_id) { 'fake-instance-id' }
