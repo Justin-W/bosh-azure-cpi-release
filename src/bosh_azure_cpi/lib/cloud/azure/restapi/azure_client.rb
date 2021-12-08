@@ -1362,6 +1362,7 @@ module Bosh::AzureCloud
     #
     def _get_load_balancer(url)
       load_balancer = nil
+      # see: https://docs.microsoft.com/en-us/rest/api/load-balancer/load-balancers/get#loadbalancer
       result = get_resource_by_id(url)
       unless result.nil?
         load_balancer = {}
@@ -1386,6 +1387,7 @@ module Bosh::AzureCloud
           load_balancer[:frontend_ip_configurations].push(ip)
         end
 
+        # see: https://docs.microsoft.com/en-us/rest/api/load-balancer/load-balancers/get#backendaddresspool
         backend = properties['backendAddressPools']
         load_balancer[:backend_address_pools] = []
         backend.each do |backend_ip|
@@ -1649,6 +1651,7 @@ module Bosh::AzureCloud
     #
     def get_application_gateway(url)
       application_gateway = nil
+      # see: https://docs.microsoft.com/en-us/rest/api/application-gateway/application-gateways/get#applicationgateway
       result = get_resource_by_id(url)
       unless result.nil?
         application_gateway = {}
@@ -1659,6 +1662,7 @@ module Bosh::AzureCloud
 
         properties = result['properties']
         # TODO: issue-644: multi-BEPool-AGW: Review: Already supports multiple ApplicationGateway Backend Address Pools?
+        # see: https://docs.microsoft.com/en-us/rest/api/application-gateway/application-gateways/get#applicationgatewaybackendaddresspool
         backend = properties['backendAddressPools']
         application_gateway[:backend_address_pools] = []
         backend.each do |backend_ip|
