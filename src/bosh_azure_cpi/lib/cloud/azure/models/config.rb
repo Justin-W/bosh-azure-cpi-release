@@ -3,6 +3,7 @@
 module Bosh::AzureCloud
   class LoadBalancerConfig
     attr_reader :name, :resource_group_name
+
     def initialize(resource_group_name, name)
       @resource_group_name = resource_group_name
       @name = name
@@ -30,6 +31,7 @@ module Bosh::AzureCloud
   class AvailabilitySetConfig
     attr_reader :name
     attr_reader :platform_update_domain_count, :platform_fault_domain_count
+
     def initialize(name, platform_update_domain_count, platform_fault_domain_count)
       @name = name
       @platform_update_domain_count = platform_update_domain_count
@@ -43,7 +45,9 @@ module Bosh::AzureCloud
 
   class AzureStackConfig
     attr_reader :domain, :authentication, :resource, :endpoint_prefix
+
     attr_writer :authentication
+
     def initialize(azure_stack_config_hash)
       @domain = azure_stack_config_hash['domain']
       @authentication = azure_stack_config_hash['authentication']
@@ -54,6 +58,7 @@ module Bosh::AzureCloud
 
   class ConfigDisk
     attr_reader :enabled
+
     def initialize(config_disk_config_hash)
       @enabled = config_disk_config_hash['enabled']
     end
@@ -61,6 +66,7 @@ module Bosh::AzureCloud
 
   class AzureConfig
     include Helpers
+
     attr_reader :environment, :subscription_id, :location, :resource_group_name
     attr_reader :azure_stack
     attr_reader :credentials_source, :tenant_id, :client_id, :client_secret, :default_managed_identity
@@ -156,6 +162,7 @@ module Bosh::AzureCloud
 
   class Config
     attr_reader :azure, :registry, :agent
+
     def initialize(config_hash)
       @config = config_hash
       @azure = AzureConfig.new(config_hash['azure'] || {})
