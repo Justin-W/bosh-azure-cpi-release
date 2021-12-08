@@ -279,6 +279,8 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
     end
 
+    # TODO: issue-644: add unit tests for new `application_gateways` config property
+
     context '#managed_identity' do
       context 'when default_managed_identity is not specified in global configurations' do
         context 'when managed_identity is not specified in vm_extensions' do

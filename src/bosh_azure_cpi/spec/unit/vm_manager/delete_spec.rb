@@ -19,10 +19,14 @@ describe Bosh::AzureCloud::VMManager do
     let(:storage_account_name) { 'fake-storage-account-name' }
     let(:vm_name) { 'fake-vm-name' }
     let(:availability_set_name) { SecureRandom.uuid.to_s }
+    # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
+    # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
     let(:appgw_name) { 'fake-ag-name' }
     let(:appgw_backend_pool_ip) { 'fake-private-ip' }
 
     let(:load_balancer) { double('load_balancer') }
+    # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
+    # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
     let(:application_gateway) { double('application_gateway') }
     let(:network_interface) do
       {
@@ -56,6 +60,8 @@ describe Bosh::AzureCloud::VMManager do
 
       allow(azure_client).to receive(:get_load_balancer_by_name)
         .with(resource_group_name, vm_name).and_return(load_balancer)
+      # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
+      # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
       allow(azure_client).to receive(:get_application_gateway_by_name)
         .with(vm_name).and_return(application_gateway)
       allow(azure_client).to receive(:get_network_interface_by_name)

@@ -10,7 +10,9 @@ module Bosh::AzureCloud
     attr_reader :availability_zone
     attr_reader :availability_set
     attr_reader :load_balancers
+    # TODO: issue-644: multi-AGW: Deprecate (how???) the obsolete `application_gateway` property.
     attr_reader :application_gateway
+    # TODO: issue-644: multi-AGW: Add the new `application_gateways` property.
     attr_reader :managed_identity
     attr_reader :security_group
     attr_reader :application_security_groups
@@ -56,8 +58,12 @@ module Bosh::AzureCloud
       @availability_set = _parse_availability_set_config(vm_properties, global_azure_config)
       cloud_error("Only one of 'availability_zone' and 'availability_set' is allowed to be configured for the VM but you have configured both.") if !@availability_zone.nil? && !@availability_set.name.nil?
 
+      # TODO: issue-644: multi-AGW: Review: `_parse_load_balancer_config` allows the 'load_balancer' prop to be either a String OR a Hash. Should we do the same thing (multi-typing) for 'application_gateway'?
       @load_balancers = _parse_load_balancer_config(vm_properties, global_azure_config)
       @application_gateway = vm_properties['application_gateway']
+      # TODO: issue-644: multi-AGW: Read/init the deprecated `application_gateway` property.
+      # TODO: issue-644: multi-AGW: Read/init the new `application_gateways` property.
+      # TODO: issue-644: multi-AGW: Validate the new `application_gateways` property.
 
       @managed_identity = global_azure_config.default_managed_identity
       managed_identity_hash = vm_properties.fetch('managed_identity', nil)

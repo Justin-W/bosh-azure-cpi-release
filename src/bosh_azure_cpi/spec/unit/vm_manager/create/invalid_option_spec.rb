@@ -202,6 +202,7 @@ describe Bosh::AzureCloud::VMManager do
       end
     end
 
+    # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
     context 'when application gateway can not be found' do
       before do
         allow(azure_client).to receive(:list_network_interfaces_by_keyword)
@@ -213,6 +214,7 @@ describe Bosh::AzureCloud::VMManager do
         allow(azure_client).to receive(:get_load_balancer_by_name)
           .with(vm_props.load_balancers.first.resource_group_name, vm_props.load_balancers.first.name)
           .and_return(load_balancer)
+        # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
         allow(azure_client).to receive(:get_application_gateway_by_name)
           .with(vm_props.application_gateway)
           .and_return(nil)

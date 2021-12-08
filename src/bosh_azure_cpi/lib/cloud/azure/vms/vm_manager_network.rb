@@ -104,6 +104,9 @@ module Bosh::AzureCloud
 
     # @return [Hash]
     def _get_application_gateway(vm_props)
+      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
+      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
+      # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
       application_gateway = nil
       unless vm_props.application_gateway.nil?
         application_gateway_name = vm_props.application_gateway
@@ -133,10 +136,12 @@ module Bosh::AzureCloud
     end
 
     def _create_network_interfaces(resource_group_name, vm_name, location, vm_props, network_configurator, primary_nic_tags = AZURE_TAGS)
+      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
+      # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
       # Tasks to prepare before creating NICs:
       #   * prepare public ip
       #   * prepare load balancer
-      #   * prepare application gateway
+      #   * prepare application gateway(s)
       tasks_preparing = []
 
       tasks_preparing.push(
@@ -183,6 +188,13 @@ module Bosh::AzureCloud
           enable_accelerated_networking: accelerated_networking
         }
         nic_params[:subnet] = _get_network_subnet(network)
+        # TODO: issue-644: multi-AGW: Review: Why are LB and AGW only initialized for the 'primary NIC' (i.e. index==0)?
+        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L228
+        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L12
+        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L60-L67
+        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L305
+        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/vms/vm_manager_network.rb#L185
+        # TODO: issue-644: multi-AGW: Review: What needs to change here to support multiple ApplicationGateways?
         if index.zero?
           nic_params[:public_ip] = public_ip
           nic_params[:tags] = primary_nic_tags
