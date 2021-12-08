@@ -89,6 +89,7 @@ module Bosh::AzureCloud
     end
 
     # @return [Array<Hash>]
+    # @see Bosh::AzureCloud::AzureClient.create_network_interface
     def _get_load_balancers(vm_props)
       load_balancers = nil
       load_balancer_configs = vm_props.load_balancers
@@ -103,6 +104,7 @@ module Bosh::AzureCloud
     end
 
     # @return [Array<Hash>]
+    # @see Bosh::AzureCloud::AzureClient.create_network_interface
     def _get_application_gateways(vm_props)
       application_gateways = nil
       application_gateway_configs = vm_props.application_gateways
@@ -135,6 +137,7 @@ module Bosh::AzureCloud
       public_ip
     end
 
+    # @return [Array<Hash>] one Hash (returned by Bosh::AzureCloud::AzureClient.get_network_interface_by_name)  per network interface created
     def _create_network_interfaces(resource_group_name, vm_name, location, vm_props, network_configurator, primary_nic_tags = AZURE_TAGS)
       # Tasks to prepare before creating NICs:
       #   * prepare public ip
