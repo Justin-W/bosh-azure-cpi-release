@@ -13,7 +13,19 @@ module Bosh::AzureCloud
     end
   end
 
-  # TODO: issue-644: multi-AGW: Review: Why isn't there a `ApplicationGatewayConfig` class here to match the `LoadBalancerConfig` class above?
+  class ApplicationGatewayConfig
+    # TODO: issue-644: multi-BEPool-AGW: Add support for explicitly specified BEPool name.
+    attr_reader :name, :resource_group_name
+
+    def initialize(resource_group_name, name)
+      @resource_group_name = resource_group_name
+      @name = name
+    end
+
+    def to_s
+      "name: #{@name}, resource_group_name: #{@resource_group_name}"
+    end
+  end
 
   class AvailabilitySetConfig
     attr_reader :name
