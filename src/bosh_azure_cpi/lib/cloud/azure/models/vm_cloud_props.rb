@@ -10,9 +10,8 @@ module Bosh::AzureCloud
     attr_reader :availability_zone
     attr_reader :availability_set
     attr_reader :load_balancers
-    # TODO: issue-644: multi-AGW: Deprecate (how???) the obsolete `application_gateway` property.
+    # TODO: issue-644: multi-AGW: Rename the `@application_gateway` attribute.
     attr_reader :application_gateway
-    # TODO: issue-644: multi-AGW: Add the new `application_gateways` property.
     attr_reader :managed_identity
     attr_reader :security_group
     attr_reader :application_security_groups
@@ -28,6 +27,7 @@ module Bosh::AzureCloud
 
     AVAILABILITY_SET_KEY = 'availability_set'
     LOAD_BALANCER_KEY = 'load_balancer'
+    APPLICATION_GATEWAY_KEY = 'application_gateway'
     RESOURCE_GROUP_NAME_KEY = 'resource_group_name'
     NAME_KEY = 'name'
 
@@ -58,12 +58,10 @@ module Bosh::AzureCloud
       @availability_set = _parse_availability_set_config(vm_properties, global_azure_config)
       cloud_error("Only one of 'availability_zone' and 'availability_set' is allowed to be configured for the VM but you have configured both.") if !@availability_zone.nil? && !@availability_set.name.nil?
 
-      # TODO: issue-644: multi-AGW: Review: `_parse_load_balancer_config` allows the 'load_balancer' prop to be either a String OR a Hash. Should we do the same thing (multi-typing) for 'application_gateway'?
       @load_balancers = _parse_load_balancer_config(vm_properties, global_azure_config)
-      @application_gateway = vm_properties['application_gateway']
-      # TODO: issue-644: multi-AGW: Read/init the deprecated `application_gateway` property.
-      # TODO: issue-644: multi-AGW: Read/init the new `application_gateways` property.
-      # TODO: issue-644: multi-AGW: Validate the new `application_gateways` property.
+
+      # TODO: issue-644: multi-AGW: Rename the `@application_gateway` attribute.
+      @application_gateway = _parse_application_gateway_config(vm_properties, global_azure_config)
 
       @managed_identity = global_azure_config.default_managed_identity
       managed_identity_hash = vm_properties.fetch('managed_identity', nil)
@@ -130,6 +128,32 @@ module Bosh::AzureCloud
         end
       end
       load_balancers.compact
+    end
+
+    # @return [Array<Bosh::AzureCloud::ApplicationGatewayConfig>,nil]
+    def _parse_application_gateway_config(vm_properties, global_azure_config)
+      application_gateway_config = vm_properties[APPLICATION_GATEWAY_KEY]
+
+      return nil unless application_gateway_config
+
+      # TODO: issue-644: multi-AGW: Support parsing 'application_gateway' property data as an Array (of Hash)
+      # TODO: issue-644: multi-AGW: Support parsing 'application_gateway' property data as a Hash
+      # cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String or a Hash.") unless application_gateway_config.is_a?(String) || application_gateway_config.is_a?(Hash)
+      cloud_error("Property '#{APPLICATION_GATEWAY_KEY}' must be a String.") unless application_gateway_config.is_a?(String)
+
+      if application_gateway_config.is_a?(Hash)
+        application_gateway_names = application_gateway_config[NAME_KEY]
+        resource_group_name = application_gateway_config[RESOURCE_GROUP_NAME_KEY]
+      else
+        application_gateway_names = application_gateway_config
+        resource_group_name = nil
+      end
+      String(application_gateway_names).split(',').map do |application_gateway_name|
+        Bosh::AzureCloud::ApplicationGatewayConfig.new(
+          resource_group_name || global_azure_config.resource_group_name,
+          application_gateway_name
+        )
+      end
     end
 
     # @return [Bosh::AzureCloud::AvailabilitySetConfig]

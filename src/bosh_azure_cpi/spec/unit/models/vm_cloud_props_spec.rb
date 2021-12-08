@@ -279,7 +279,65 @@ describe Bosh::AzureCloud::VMCloudProps do
       end
     end
 
-    # TODO: issue-644: add unit tests for new `application_gateways` config property
+    context 'when application_gateway is a hash' do
+      let(:vm_cloud_properties) do
+        {
+          'application_gateway' => { 'name' => 'a' },
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'application_gateway\' must be a String.')
+      end
+    end
+
+    context 'when application_gateway is an array of string' do
+      let(:vm_cloud_properties) do
+        {
+          'application_gateway' => ['a'],
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'application_gateway\' must be a String.')
+      end
+    end
+
+    context 'when application_gateway is an array of hash' do
+      let(:vm_cloud_properties) do
+        {
+          'application_gateway' => [{ 'name' => 'a' }],
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'application_gateway\' must be a String.')
+      end
+    end
+
+    context 'when application_gateway is an int' do
+      let(:vm_cloud_properties) do
+        {
+          'application_gateway' => 123,
+          'instance_type' => 't'
+        }
+      end
+
+      it 'should raise an error' do
+        expect do
+          Bosh::AzureCloud::VMCloudProps.new(vm_cloud_properties, azure_config_managed)
+        end.to raise_error('Property \'application_gateway\' must be a String.')
+      end
+    end
 
     context '#managed_identity' do
       context 'when default_managed_identity is not specified in global configurations' do
