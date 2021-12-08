@@ -1634,7 +1634,6 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/application-gateway/applicationgateways/get
     #
     def get_application_gateway_by_name(resource_group_name, name)
-      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_APPLICATION_GATEWAYS, resource_group_name: resource_group_name, name: name)
       get_application_gateway(url)
     end
@@ -1647,7 +1646,6 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/application-gateway/applicationgateways/get
     #
     def get_application_gateway(url)
-      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
       application_gateway = nil
       result = get_resource_by_id(url)
       unless result.nil?
