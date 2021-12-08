@@ -14,6 +14,7 @@ module Bosh::AzureCloud
   class AzureConflictError < AzureError; end
   class AzureInternalError < AzureError; end
   class AzureAsynInternalError < AzureError; end
+
   class AzureAsynchronousError < AzureError
     attr_accessor :status, :error
 
