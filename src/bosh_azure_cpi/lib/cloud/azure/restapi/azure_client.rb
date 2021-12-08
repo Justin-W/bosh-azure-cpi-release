@@ -1431,8 +1431,6 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/network/create-or-update-a-network-interface-card
     #
     def create_network_interface(resource_group_name, nic_params)
-      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
-      # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES, resource_group_name: resource_group_name, name: nic_params[:name])
 
       interface = {
@@ -1482,15 +1480,11 @@ module Bosh::AzureCloud
         interface['properties']['ipConfigurations'][0]['properties']['loadBalancerInboundNatRules'] = inbound_nat_rules
       end
 
-      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
       application_gateways = nic_params[:application_gateways]
       unless application_gateways.nil?
-        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
-        interface['properties']['ipConfigurations'][0]['properties']['applicationGatewayBackendAddressPools'] = [
-          {
-            'id' => application_gateways[:backend_address_pools][0][:id]
-          }
-        ]
+        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple (named) ApplicationGateway Backend Address Pools
+        backend_pools = application_gateways.map { |application_gateway| {'id' => application_gateway[:backend_address_pools][0][:id]} }
+        interface['properties']['ipConfigurations'][0]['properties']['applicationGatewayBackendAddressPools'] = backend_pools
       end
 
       http_put(url, interface)
