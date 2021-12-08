@@ -619,7 +619,6 @@ module Bosh::AzureCloud
       end
       with_thread_name("detach_disk(#{vm_cid},#{disk_cid})") do
         @telemetry_manager.monitor('detach_disk', id: vm_cid) do
-
           if _should_write_to_registry?
             _update_agent_settings(vm_cid) do |settings|
               settings['disks'] ||= {}

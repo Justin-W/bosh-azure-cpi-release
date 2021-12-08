@@ -21,15 +21,6 @@ Layout/ClosingParenthesisIndentation:
     - 'lib/cloud/azure/cloud.rb'
     - 'spec/unit/cloud/create_vm_spec.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: empty_lines, no_empty_lines
-Layout/EmptyLinesAroundBlockBody:
-  Exclude:
-    - 'lib/cloud/azure/cloud.rb'
-    - 'spec/unit/utils/bosh_agent_util_spec.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowForAlignment, AllowBeforeTrailingComments, ForceEqualSignAlignment.
