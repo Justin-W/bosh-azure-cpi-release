@@ -1424,8 +1424,8 @@ module Bosh::AzureCloud
     # * +:dns_servers                   - Array. DNS servers.
     # * +:network_security_group        - Hash. The network security group which the network interface is bound to.
     # * +:application_security_groups   - Array. The application security groups which the network interface is bound to.
-    # * +:load_balancers                - Array<Hash>. The load balancers which the network interface is bound to.
-    # * +:application_gateways          - Array<Hash>. The application gateways which the network interface is bound to.
+    # * +:load_balancers                - Array<Hash>. The load balancers which the network interface is bound to. (see: Bosh::AzureCloud::VMManager._get_load_balancers)
+    # * +:application_gateways          - Array<Hash>. The application gateways which the network interface is bound to. (see: Bosh::AzureCloud::VMManager._get_application_gateways)
     #
     # @return [Boolean]
     #
@@ -1468,6 +1468,7 @@ module Bosh::AzureCloud
       end
       interface['properties']['ipConfigurations'][0]['properties']['applicationSecurityGroups'] = application_security_groups unless application_security_groups.empty?
 
+      # see: Bosh::AzureCloud::VMManager._get_load_balancers
       load_balancers = nic_params[:load_balancers]
       unless load_balancers.nil?
         backend_pools = load_balancers.map { |load_balancer| {:id => load_balancer[:backend_address_pools][0][:id]} }
@@ -1481,6 +1482,7 @@ module Bosh::AzureCloud
         interface['properties']['ipConfigurations'][0]['properties']['loadBalancerInboundNatRules'] = inbound_nat_rules
       end
 
+      # see: Bosh::AzureCloud::VMManager._get_application_gateways
       application_gateways = nic_params[:application_gateways]
       unless application_gateways.nil?
         # TODO: issue-644: multi-BEPool-AGW: Add support for multiple (named) ApplicationGateway Backend Address Pools
