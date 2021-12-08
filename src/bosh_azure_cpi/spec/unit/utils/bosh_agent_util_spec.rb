@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Bosh::AzureCloud::BoshAgentUtil do
-
   subject(:agent_util) { described_class.new(uses_registry) }
 
   let(:registry_endpoint) { 'http://fake-registry.url/' }
