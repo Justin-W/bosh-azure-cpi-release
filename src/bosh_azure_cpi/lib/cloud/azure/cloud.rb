@@ -9,6 +9,7 @@ module Bosh::AzureCloud
     attr_reader   :disk_manager, :disk_manager2, :stemcell_manager, :stemcell_manager2, :light_stemcell_manager
     attr_reader   :props_factory
     attr_reader   :api_version, :stemcell_api_version
+
     include Helpers
 
     # CPI API Version
