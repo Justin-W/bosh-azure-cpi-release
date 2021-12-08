@@ -451,6 +451,9 @@ describe Bosh::AzureCloud::AzureClient do
         end
       end
 
+      # NOTE: issue-644: unit tests for single-AGW, single-pool
+      # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
+      # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
       context 'with application gateway' do
         let(:nic_params) do
           {

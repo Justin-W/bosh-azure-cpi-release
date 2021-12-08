@@ -7,6 +7,7 @@ describe Bosh::AzureCloud::Cloud do
     @application_gateway_name = ENV.fetch('BOSH_AZURE_APPLICATION_GATEWAY_NAME')
   end
 
+  # NOTE: issue-644: unit tests for original `application_gateway` config (single-AGW, unspecified-pool)
   context 'when application_gateway is specified in resource pool' do
     let(:network_spec) do
       {
@@ -53,6 +54,8 @@ describe Bosh::AzureCloud::Cloud do
       end
     end
 
+    # TODO: issue-644: multi-AGW: add integration tests for multi-AGWs
+    # TODO: issue-644: multi-BEPool-AGW: add integration tests for multi-pool AGWs
     it 'should add the VM to the backend pool of application gateway' do
       ag_url = get_azure_client.rest_api_url(
         Bosh::AzureCloud::AzureClient::REST_API_PROVIDER_NETWORK,

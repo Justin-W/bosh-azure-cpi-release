@@ -58,6 +58,8 @@ Update the cloud config from
 to
 
 ```
+# TODO: issue-644: multi-AGW: Update these docs to use the new AGW CPI schema.
+# TODO: issue-644: multi-BEPool-AGW: Update these docs to use the new AGW CPI schema.
 - name: cf-router-network-properties
   cloud_properties:
     application_gateway: ((application_gateway_name))

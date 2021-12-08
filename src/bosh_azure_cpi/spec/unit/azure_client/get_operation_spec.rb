@@ -170,6 +170,8 @@ describe Bosh::AzureCloud::AzureClient do
     }
   end
 
+  # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
+  # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
   # Application Gateway
   let(:application_gateway_name) { 'fake-name' }
   let(:application_gateway_id) { "/subscriptions/#{subscription_id}/resourceGroups/#{default_resource_group_name}/providers/Microsoft.Network/applicationGateways/#{application_gateway_name}" }

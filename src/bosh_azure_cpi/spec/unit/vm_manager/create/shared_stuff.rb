@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
 # The following default configurations are shared. If one case needs a specific configuration, it should overwrite it.
 shared_context 'shared stuff for vm manager' do
   # Parameters of VMManager.initialize

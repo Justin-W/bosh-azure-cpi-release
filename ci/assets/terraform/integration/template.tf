@@ -182,6 +182,8 @@ resource "azurerm_application_security_group" "azure_asg" {
   resource_group_name          = azurerm_resource_group.azure_default_rg.name
 }
 
+# TODO: issue-644: multi-AGW: Review: Are changes needed here for multi-AGWs?
+# TODO: issue-644: multi-BEPool-AGW: Are changes needed here for multi-pool AGWs?
 # Public IP Address for Application Gateway
 resource "azurerm_public_ip" "azure_ip_application_gateway" {
   name                         = "azure_ip_application_gateway"
@@ -369,6 +371,8 @@ output "public_ip_in_default_rg" {
 output "public_ip_in_additional_rg" {
   value = azurerm_public_ip.azure_ip_integration_in_additional_rg.ip_address
 }
+# TODO: issue-644: multi-AGW: Review: Are changes needed here for multi-AGWs?
+# TODO: issue-644: multi-BEPool-AGW: Are changes needed here for multi-pool AGWs?
 output "asg_name" {
   value = azurerm_application_security_group.azure_asg.name
 }

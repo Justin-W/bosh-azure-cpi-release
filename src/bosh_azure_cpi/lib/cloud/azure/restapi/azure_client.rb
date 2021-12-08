@@ -302,6 +302,12 @@ module Bosh::AzureCloud
         network_interfaces_params.push(
           'id' => network_interface[:id],
           'properties' => {
+            # TODO: issue-644: multi-AGW: Review: What is special/different about the first/primary NIC vs other NICs?
+            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L228
+            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/vms/vm_manager_network.rb#L185
+            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L12
+            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L60-L67
+            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L305
             'primary' => index.zero?
           }
         )
@@ -1425,6 +1431,8 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/network/create-or-update-a-network-interface-card
     #
     def create_network_interface(resource_group_name, nic_params)
+      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
+      # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES, resource_group_name: resource_group_name, name: nic_params[:name])
 
       interface = {
@@ -1474,8 +1482,10 @@ module Bosh::AzureCloud
         interface['properties']['ipConfigurations'][0]['properties']['loadBalancerInboundNatRules'] = inbound_nat_rules
       end
 
+      # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
       application_gateway = nic_params[:application_gateway]
       unless application_gateway.nil?
+        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
         interface['properties']['ipConfigurations'][0]['properties']['applicationGatewayBackendAddressPools'] = [
           {
             'id' => application_gateway[:backend_address_pools][0][:id]
@@ -1541,6 +1551,8 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/network/delete-a-network-interface-card
     #
     def delete_network_interface(resource_group_name, name)
+      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
+      # TODO: issue-644: multi-BEPool-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateway Backend Address Pools?
       @logger.debug("delete_network_interface - trying to delete #{name} from resource group #{resource_group_name}")
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES, resource_group_name: resource_group_name, name: name)
       http_delete(url)
@@ -1626,6 +1638,7 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/application-gateway/applicationgateways/get
     #
     def get_application_gateway_by_name(name)
+      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_APPLICATION_GATEWAYS, name: name)
       get_application_gateway(url)
     end
@@ -1638,6 +1651,7 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/application-gateway/applicationgateways/get
     #
     def get_application_gateway(url)
+      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
       application_gateway = nil
       result = get_resource_by_id(url)
       unless result.nil?
@@ -1648,6 +1662,7 @@ module Bosh::AzureCloud
         application_gateway[:tags] = result['tags']
 
         properties = result['properties']
+        # TODO: issue-644: multi-BEPool-AGW: Review: Already supports multiple ApplicationGateway Backend Address Pools?
         backend = properties['backendAddressPools']
         application_gateway[:backend_address_pools] = []
         backend.each do |backend_ip|
@@ -2070,6 +2085,8 @@ module Bosh::AzureCloud
           end
           interface[:load_balancers] = load_balancers
         end
+        # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
+        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
         unless ip_configuration_properties['applicationGatewayBackendAddressPools'].nil?
           if recursive
             names = _parse_name_from_id(ip_configuration_properties['applicationGatewayBackendAddressPools'][0]['id'])

@@ -58,6 +58,7 @@ describe Bosh::AzureCloud::VMManager do
               .and_return(name: storage_account_name)
           end
 
+          # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
           it 'creates a public IP and assigns it to the primary NIC' do
             expect(azure_client).to receive(:create_public_ip)
               .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)
@@ -87,6 +88,7 @@ describe Bosh::AzureCloud::VMManager do
             }
           end
 
+          # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
           it 'creates a public IP and assigns it to the NIC' do
             expect(azure_client).to receive(:create_public_ip)
               .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)

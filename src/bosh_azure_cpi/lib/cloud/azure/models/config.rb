@@ -13,6 +13,8 @@ module Bosh::AzureCloud
     end
   end
 
+  # TODO: issue-644: multi-AGW: Review: Why isn't there a `ApplicationGatewayConfig` class here to match the `LoadBalancerConfig` class above?
+
   class AvailabilitySetConfig
     attr_reader :name
     attr_reader :platform_update_domain_count, :platform_fault_domain_count

@@ -15,6 +15,9 @@ module Bosh::AzureCloud
     end
 
     def self.validate_options(options)
+      # TODO: issue-644: multi-AGW: Review: What needs to change here (if anything) to support multiple ApplicationGateways?
+      #      I think nothing needs to change, since (I think) this validates global options, and not vm_type/vm_extension options. But should double-check.
+
       # TODO: implement this.
       azure_config_hash = options['azure']
       error_msg = 'azure_stack should be there if environment is AzureStack.'
