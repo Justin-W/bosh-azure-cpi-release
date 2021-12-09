@@ -271,6 +271,31 @@ describe Bosh::AzureCloud::AzureClient do
 
       # NOTE: issue-644: unit tests for single-LB, single-pool
       context 'with load balancer' do
+        before do
+          stub_request(:post, token_uri).to_return(
+            status: 200,
+            body: {
+              'access_token' => valid_access_token,
+              'expires_on' => expires_on
+            }.to_json,
+            headers: {}
+          )
+          stub_request(:put, network_interface_uri)
+            .with(body: request_body.to_json)
+            .to_return(
+              status: 200,
+              body: '',
+              headers: {
+                'azure-asyncoperation' => operation_status_link
+              }
+            )
+          stub_request(:get, operation_status_link).to_return(
+            status: 200,
+            body: '{"status":"Succeeded"}',
+            headers: {}
+          )
+        end
+
         context 'with single backend pool' do
           let(:nic_params) do
             {
@@ -338,29 +363,6 @@ describe Bosh::AzureCloud::AzureClient do
           end
 
           it 'should create a network interface without error' do
-            stub_request(:post, token_uri).to_return(
-              status: 200,
-              body: {
-                'access_token' => valid_access_token,
-                'expires_on' => expires_on
-              }.to_json,
-              headers: {}
-            )
-            stub_request(:put, network_interface_uri)
-              .with(body: request_body.to_json)
-              .to_return(
-                status: 200,
-                body: '',
-                headers: {
-                  'azure-asyncoperation' => operation_status_link
-                }
-              )
-            stub_request(:get, operation_status_link).to_return(
-              status: 200,
-              body: '{"status":"Succeeded"}',
-              headers: {}
-            )
-
             expect do
               azure_client.create_network_interface(resource_group, nic_params)
             end.not_to raise_error
