@@ -380,11 +380,11 @@ describe Bosh::AzureCloud::AzureClient do
             # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
             it 'should use the specified backend_pools'
           end
+        end
 
-          context 'when an invalid backend_pool_name is specified' do
-            # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
-            it 'should raise an error'
-          end
+        context 'when an invalid backend_pool_name is specified' do
+          # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
+          it 'should raise an error'
         end
       end
 
