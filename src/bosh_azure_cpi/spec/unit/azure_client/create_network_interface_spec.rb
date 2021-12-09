@@ -1060,12 +1060,14 @@ describe Bosh::AzureCloud::AzureClient do
         end
 
         context 'with multiple backend pools' do
-          # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
-          it 'should create a network interface without error'
+          context 'when backend_pool_name is not specified' do
+            # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
+            it 'should use the default backend_pools'
+          end
 
           context 'when backend_pool_name is specified' do
             # TODO: issue-644: multi-BEPool-AGW: add unit tests for named-pool AGWs
-            it 'should use the specified backend_pool'
+            it 'should use the specified backend_pools'
           end
 
           context 'when an invalid backend_pool_name is specified' do
