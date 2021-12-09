@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
-# The following default configurations are shared. If one case needs a specific configuration, it should overwrite it.
+# NOTE: The following default configurations are shared. If one case needs a specific configuration, it should overwrite it.
 shared_context 'shared stuff for vm manager' do
   # Parameters of VMManager.initialize
   let(:azure_config) { mock_azure_config }
@@ -54,7 +53,16 @@ shared_context 'shared stuff for vm manager' do
       'storage_account_name' => 'dfe03ad623f34d42999e93ca',
       'caching' => 'ReadWrite',
       'load_balancer' => 'fake-lb-name',
+      # 'load_balancer' => {
+      #   # 'resource_group_name' => 'fake-rg-name',
+      #   'name' => 'fake-lb-name'
+      # },
       'application_gateway' => 'fake-ag-name'
+      # 'application_gateway' => {
+      #   # 'resource_group_name' => 'fake-rg-name',
+      #   'name' => 'fake-ag-name'
+      #   # 'backend_pool_name' => 'fake-pool-name'
+      # }
     }
   end
   let(:vm_props) do
@@ -117,9 +125,29 @@ shared_context 'shared stuff for vm manager' do
   end
   let(:application_gateway) do
     {
-      name: 'fake-ag-name'
+      name: 'fake-ag-name',
+      backend_address_pools: [
+        {
+          name: 'fake-pool-name',
+          id: 'fake-pool-id',
+          provisioning_state: 'fake-pool-state',
+          backend_ip_configurations: []
+        }
+      ]
     }
   end
+  # let(:network_interfaces) do
+  #   [
+  #     {
+  #       name: 'fake-possible-nic-1',
+  #       tags: {}
+  #     },
+  #     {
+  #       name: 'fake-possible-nic-2',
+  #       tags: {}
+  #     }
+  #   ]
+  # end
   before do
     allow(Bosh::AzureCloud::AzureClient).to receive(:new)
       .and_return(azure_client)
@@ -129,12 +157,29 @@ shared_context 'shared stuff for vm manager' do
     allow(azure_client).to receive(:get_network_security_group_by_name)
       .with(MOCK_RESOURCE_GROUP_NAME, MOCK_DEFAULT_SECURITY_GROUP)
       .and_return(default_security_group)
+    load_balancer_config = vm_properties['load_balancer']
+    load_balancer_name = load_balancer_config.is_a?(Hash) ? load_balancer_config['name'] : load_balancer_config
+    load_balancer_rg = load_balancer_config.is_a?(Hash) ? load_balancer_config['resource_group_name'] : nil
+    load_balancer_rg ||= MOCK_RESOURCE_GROUP_NAME
     allow(azure_client).to receive(:get_load_balancer_by_name)
-      .with(MOCK_RESOURCE_GROUP_NAME, vm_properties['load_balancer'])
+      .with(load_balancer_rg, load_balancer_name)
       .and_return(load_balancer)
+    application_gateway_config = vm_properties['application_gateway']
+    application_gateway_name = application_gateway_config.is_a?(Hash) ? application_gateway_config['name'] : application_gateway_config
+    application_gateway_rg = application_gateway_config.is_a?(Hash) ? application_gateway_config['resource_group_name'] : nil
     allow(azure_client).to receive(:get_application_gateway_by_name)
-      .with(nil, vm_properties['application_gateway'])
+      .with(application_gateway_rg, application_gateway_name)
       .and_return(application_gateway)
+    # NOTE: If the `:vm_properties` var's `application_gateway/backend_pool_name` doesn't match the `:application_gateway` data's pools,
+    #     then the mock below would be needed to enable usable rspec stack traces.
+    #     Without this mock, the output gives `... received unexpected message :list_network_interfaces_by_keyword with ...`
+    #     which doesn't include the actual error which was raised. Not very useful when debugging spec failures.
+    # TODO: issue-644: Review: Uncommenting the mock below doesn't SEEM to harm anything,
+    #     even when the spec shared data is correct (and an error like the one mentioned above is NOT raised).
+    #     However, since I'm not CERTAIN it wouldn't cause problems, I've left it commented out for now.
+    # allow(azure_client).to receive(:list_network_interfaces_by_keyword)
+    #   .with(MOCK_RESOURCE_GROUP_NAME, vm_name)
+    #   .and_return([]) # .and_return(network_interfaces)
     allow(azure_client).to receive(:get_public_ip_by_name)
       .with(MOCK_RESOURCE_GROUP_NAME, vm_name)
       .and_return(nil)
