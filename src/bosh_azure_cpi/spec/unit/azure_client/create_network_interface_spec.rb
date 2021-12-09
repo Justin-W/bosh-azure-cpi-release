@@ -533,7 +533,8 @@ describe Bosh::AzureCloud::AzureClient do
               application_gateways: [{
                 backend_address_pools: [
                   {
-                    id: 'fake-id-2'
+                    name: 'fake-agw-pool-name',
+                    id: 'fake-agw-pool-id'
                   }
                 ]
               }]
@@ -561,7 +562,7 @@ describe Bosh::AzureCloud::AzureClient do
                     },
                     applicationGatewayBackendAddressPools: [
                       {
-                        id: 'fake-id-2'
+                        id: 'fake-agw-pool-id'
                       }
                     ]
                   }
