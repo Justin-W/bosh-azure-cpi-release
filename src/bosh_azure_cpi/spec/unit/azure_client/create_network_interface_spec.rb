@@ -271,98 +271,100 @@ describe Bosh::AzureCloud::AzureClient do
 
       # NOTE: issue-644: unit tests for single-LB, single-pool
       context 'with load balancer' do
-        let(:nic_params) do
-          {
-            name: nic_name,
-            location: 'fake-location',
-            ipconfig_name: 'fake-ipconfig-name',
-            subnet: { id: subnet[:id] },
-            tags: {},
-            enable_ip_forwarding: false,
-            enable_accelerated_networking: false,
-            private_ip: '10.0.0.100',
-            dns_servers: ['168.63.129.16'],
-            public_ip: { id: 'fake-public-id' },
-            network_security_group: { id: nsg_id },
-            application_security_groups: [],
-            load_balancers: [{
-              backend_address_pools: [
-                {
-                  id: 'fake-id'
-                }
-              ],
-              frontend_ip_configurations: [
-                {
-                  inbound_nat_rules: [{}]
-                }
-              ]
-            }],
-            application_gateways: nil
-          }
-        end
-
-        let(:request_body) do
-          {
-            name: nic_params[:name],
-            location: nic_params[:location],
-            tags: {},
-            properties: {
-              networkSecurityGroup: {
-                id: nic_params[:network_security_group][:id]
-              },
-              enableIPForwarding: false,
-              enableAcceleratedNetworking: false,
-              ipConfigurations: [{
-                name: nic_params[:ipconfig_name],
-                properties: {
-                  privateIPAddress: nic_params[:private_ip],
-                  privateIPAllocationMethod: 'Static',
-                  publicIPAddress: { id: nic_params[:public_ip][:id] },
-                  subnet: {
-                    id: subnet[:id]
-                  },
-                  loadBalancerBackendAddressPools: [
-                    {
-                      id: 'fake-id'
-                    }
-                  ],
-                  loadBalancerInboundNatRules: [{}]
-                }
+        context 'with single backend pool' do
+          let(:nic_params) do
+            {
+              name: nic_name,
+              location: 'fake-location',
+              ipconfig_name: 'fake-ipconfig-name',
+              subnet: { id: subnet[:id] },
+              tags: {},
+              enable_ip_forwarding: false,
+              enable_accelerated_networking: false,
+              private_ip: '10.0.0.100',
+              dns_servers: ['168.63.129.16'],
+              public_ip: { id: 'fake-public-id' },
+              network_security_group: { id: nsg_id },
+              application_security_groups: [],
+              load_balancers: [{
+                backend_address_pools: [
+                  {
+                    id: 'fake-id'
+                  }
+                ],
+                frontend_ip_configurations: [
+                  {
+                    inbound_nat_rules: [{}]
+                  }
+                ]
               }],
-              dnsSettings: {
-                dnsServers: ['168.63.129.16']
+              application_gateways: nil
+            }
+          end
+
+          let(:request_body) do
+            {
+              name: nic_params[:name],
+              location: nic_params[:location],
+              tags: {},
+              properties: {
+                networkSecurityGroup: {
+                  id: nic_params[:network_security_group][:id]
+                },
+                enableIPForwarding: false,
+                enableAcceleratedNetworking: false,
+                ipConfigurations: [{
+                  name: nic_params[:ipconfig_name],
+                  properties: {
+                    privateIPAddress: nic_params[:private_ip],
+                    privateIPAllocationMethod: 'Static',
+                    publicIPAddress: { id: nic_params[:public_ip][:id] },
+                    subnet: {
+                      id: subnet[:id]
+                    },
+                    loadBalancerBackendAddressPools: [
+                      {
+                        id: 'fake-id'
+                      }
+                    ],
+                    loadBalancerInboundNatRules: [{}]
+                  }
+                }],
+                dnsSettings: {
+                  dnsServers: ['168.63.129.16']
+                }
               }
             }
-          }
-        end
+          end
 
-        it 'should create a network interface without error' do
-          stub_request(:post, token_uri).to_return(
-            status: 200,
-            body: {
-              'access_token' => valid_access_token,
-              'expires_on' => expires_on
-            }.to_json,
-            headers: {}
-          )
-          stub_request(:put, network_interface_uri)
-            .with(body: request_body.to_json)
-            .to_return(
+          it 'should create a network interface without error' do
+            stub_request(:post, token_uri).to_return(
               status: 200,
-              body: '',
-              headers: {
-                'azure-asyncoperation' => operation_status_link
-              }
+              body: {
+                'access_token' => valid_access_token,
+                'expires_on' => expires_on
+              }.to_json,
+              headers: {}
             )
-          stub_request(:get, operation_status_link).to_return(
-            status: 200,
-            body: '{"status":"Succeeded"}',
-            headers: {}
-          )
+            stub_request(:put, network_interface_uri)
+              .with(body: request_body.to_json)
+              .to_return(
+                status: 200,
+                body: '',
+                headers: {
+                  'azure-asyncoperation' => operation_status_link
+                }
+              )
+            stub_request(:get, operation_status_link).to_return(
+              status: 200,
+              body: '{"status":"Succeeded"}',
+              headers: {}
+            )
 
-          expect do
-            azure_client.create_network_interface(resource_group, nic_params)
-          end.not_to raise_error
+            expect do
+              azure_client.create_network_interface(resource_group, nic_params)
+            end.not_to raise_error
+          end
         end
 
         context 'with multiple backend pools' do
