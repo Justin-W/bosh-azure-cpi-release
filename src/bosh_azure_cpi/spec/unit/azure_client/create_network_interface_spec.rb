@@ -314,7 +314,8 @@ describe Bosh::AzureCloud::AzureClient do
               load_balancers: [{
                 backend_address_pools: [
                   {
-                    id: 'fake-id'
+                    name: 'fake-lb-pool-name',
+                    id: 'fake-lb-pool-id'
                   }
                 ],
                 frontend_ip_configurations: [
@@ -349,7 +350,7 @@ describe Bosh::AzureCloud::AzureClient do
                     },
                     loadBalancerBackendAddressPools: [
                       {
-                        id: 'fake-id'
+                        id: 'fake-lb-pool-id'
                       }
                     ],
                     loadBalancerInboundNatRules: [{}]
