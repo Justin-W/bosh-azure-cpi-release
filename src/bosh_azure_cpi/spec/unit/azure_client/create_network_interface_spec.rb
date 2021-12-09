@@ -269,6 +269,7 @@ describe Bosh::AzureCloud::AzureClient do
         end
       end
 
+      # NOTE: issue-644: unit tests for single-LB, single-pool
       context 'with load balancer' do
         let(:nic_params) do
           {
