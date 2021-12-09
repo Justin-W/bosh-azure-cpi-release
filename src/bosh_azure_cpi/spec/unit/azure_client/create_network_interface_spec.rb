@@ -489,65 +489,7 @@ describe Bosh::AzureCloud::AzureClient do
 
       # NOTE: issue-644: unit tests for single-AGW, single-pool
       context 'with application gateway' do
-        let(:nic_params) do
-          {
-            name: nic_name,
-            location: 'fake-location',
-            ipconfig_name: 'fake-ipconfig-name',
-            subnet: { id: subnet[:id] },
-            tags: {},
-            enable_ip_forwarding: false,
-            enable_accelerated_networking: false,
-            private_ip: '10.0.0.100',
-            dns_servers: ['168.63.129.16'],
-            public_ip: { id: 'fake-public-id' },
-            network_security_group: { id: nsg_id },
-            application_security_groups: [],
-            load_balancers: nil,
-            application_gateways: [{
-              backend_address_pools: [
-                {
-                  id: 'fake-id-2'
-                }
-              ]
-            }]
-          }
-        end
-        let(:request_body) do
-          {
-            name: nic_params[:name],
-            location: nic_params[:location],
-            tags: {},
-            properties: {
-              networkSecurityGroup: {
-                id: nic_params[:network_security_group][:id]
-              },
-              enableIPForwarding: false,
-              enableAcceleratedNetworking: false,
-              ipConfigurations: [{
-                name: nic_params[:ipconfig_name],
-                properties: {
-                  privateIPAddress: nic_params[:private_ip],
-                  privateIPAllocationMethod: 'Static',
-                  publicIPAddress: { id: nic_params[:public_ip][:id] },
-                  subnet: {
-                    id: subnet[:id]
-                  },
-                  applicationGatewayBackendAddressPools: [
-                    {
-                      id: 'fake-id-2'
-                    }
-                  ]
-                }
-              }],
-              dnsSettings: {
-                dnsServers: ['168.63.129.16']
-              }
-            }
-          }
-        end
-
-        it 'should create a network interface without error' do
+        before do
           stub_request(:post, token_uri).to_return(
             status: 200,
             body: {
@@ -570,10 +512,73 @@ describe Bosh::AzureCloud::AzureClient do
             body: '{"status":"Succeeded"}',
             headers: {}
           )
+        end
 
-          expect do
-            azure_client.create_network_interface(resource_group, nic_params)
-          end.not_to raise_error
+        context 'with single backend pool' do
+          let(:nic_params) do
+            {
+              name: nic_name,
+              location: 'fake-location',
+              ipconfig_name: 'fake-ipconfig-name',
+              subnet: { id: subnet[:id] },
+              tags: {},
+              enable_ip_forwarding: false,
+              enable_accelerated_networking: false,
+              private_ip: '10.0.0.100',
+              dns_servers: ['168.63.129.16'],
+              public_ip: { id: 'fake-public-id' },
+              network_security_group: { id: nsg_id },
+              application_security_groups: [],
+              load_balancers: nil,
+              application_gateways: [{
+                backend_address_pools: [
+                  {
+                    name: 'fake-agw-pool-name',
+                    id: 'fake-agw-pool-id'
+                  }
+                ]
+              }]
+            }
+          end
+          let(:request_body) do
+            {
+              name: nic_params[:name],
+              location: nic_params[:location],
+              tags: {},
+              properties: {
+                networkSecurityGroup: {
+                  id: nic_params[:network_security_group][:id]
+                },
+                enableIPForwarding: false,
+                enableAcceleratedNetworking: false,
+                ipConfigurations: [{
+                  name: nic_params[:ipconfig_name],
+                  properties: {
+                    privateIPAddress: nic_params[:private_ip],
+                    privateIPAllocationMethod: 'Static',
+                    publicIPAddress: { id: nic_params[:public_ip][:id] },
+                    subnet: {
+                      id: subnet[:id]
+                    },
+                    applicationGatewayBackendAddressPools: [
+                      {
+                        id: 'fake-agw-pool-id'
+                      }
+                    ]
+                  }
+                }],
+                dnsSettings: {
+                  dnsServers: ['168.63.129.16']
+                }
+              }
+            }
+          end
+
+          it 'should create a network interface without error' do
+            expect do
+              azure_client.create_network_interface(resource_group, nic_params)
+            end.not_to raise_error
+          end
         end
 
         context 'with multiple backend pools' do
