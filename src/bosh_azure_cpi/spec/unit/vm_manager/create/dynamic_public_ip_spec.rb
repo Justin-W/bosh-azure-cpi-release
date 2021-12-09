@@ -74,6 +74,7 @@ describe Bosh::AzureCloud::VMManager do
 
             _, vm_params = vm_manager_for_pip.create(bosh_vm_meta, location, vm_props, disk_cids, network_configurator, env, agent_util, network_spec, config)
             expect(vm_params[:name]).to eq(vm_name)
+            # TODO: Add more expectations here? The expects above only verify that the VM was created, but not that the IP was assigned to the NIC correctly.
           end
 
           context 'with single load_balancer' do
@@ -157,6 +158,7 @@ describe Bosh::AzureCloud::VMManager do
 
             _, vm_params = vm_manager.create(bosh_vm_meta, location, vm_props, disk_cids, network_configurator, env, agent_util, network_spec, config)
             expect(vm_params[:name]).to eq(vm_name)
+            # TODO: Add more expectations here? The expects above only verify that the VM was created, but not that the IP was assigned to the NIC correctly.
           end
         end
       end
