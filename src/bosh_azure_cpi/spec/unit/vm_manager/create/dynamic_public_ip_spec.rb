@@ -75,18 +75,6 @@ describe Bosh::AzureCloud::VMManager do
 
             context 'with single load_balancer' do
               it 'creates a public IP and assigns it to the primary NIC' do
-                expect(azure_client).to receive(:create_public_ip)
-                  .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)
-                expect(azure_client).to receive(:create_network_interface)
-                  .with(MOCK_RESOURCE_GROUP_NAME, hash_including(
-                                                    name: "#{vm_name}-0",
-                                                    public_ip: dynamic_public_ip,
-                                                    subnet: subnet,
-                                                    tags: tags,
-                                                    load_balancers: [ load_balancer ],
-                                                    application_gateways: [application_gateway]
-                                                  )).once
-
                 _, vm_params = vm_manager_for_pip.create(bosh_vm_meta, location, vm_props, disk_cids, network_configurator, env, agent_util, network_spec, config)
                 expect(vm_params[:name]).to eq(vm_name)
                 # TODO: Add more expectations here? The expects above only verify that the VM was created, but not that the IP was assigned to the NIC correctly.
