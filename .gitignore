@@ -14,6 +14,7 @@ rubocop_cache/
 #src/bosh_azure_cpi/501/rubocop_cache/
 src/bosh_azure_cpi/vendor/cache
 src/bosh_azure_cpi/coverage
+src/bosh_azure_cpi/coverage_*/
 src/bosh_azure_cpi/spec/manual_tests/performance/stemcell_to_test.tgz
 src/bosh_azure_cpi/spec/manual_tests/performance/stemcell_folder/*
 src/bosh_azure_cpi/spec/manual_tests/performance/cpi.cfg
