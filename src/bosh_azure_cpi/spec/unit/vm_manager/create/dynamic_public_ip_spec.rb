@@ -299,41 +299,48 @@ describe Bosh::AzureCloud::VMManager do
             end
           end
 
-          context 'with single application_gateway' do
-            context 'when application_gateway has multiple backend pools' do
-              let(:application_gateway) do
-                {
-                  name: 'fake-ag-name',
-                  backend_address_pools: [
-                    {
-                      name: 'fake-pool-name',
-                      id: 'fake-pool-id',
-                      provisioning_state: 'fake-pool-state',
-                      backend_ip_configurations: []
-                    },
-                    {
-                      name: 'fake-pool2-name',
-                      id: 'fake-pool2-id',
-                      provisioning_state: 'fake-pool2-state',
-                      backend_ip_configurations: []
-                    }
-                  ]
-                }
+          context 'with valid application_gateway config' do
+            before do
+              expect(azure_client).to receive(:create_public_ip)
+                .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)
+              expect(azure_client).to receive(:create_network_interface)
+                .with(MOCK_RESOURCE_GROUP_NAME, hash_including(
+                                                  name: "#{vm_name}-0",
+                                                  public_ip: dynamic_public_ip,
+                                                  subnet: subnet,
+                                                  tags: tags,
+                                                  load_balancers: [ load_balancer ],
+                                                  application_gateways: [application_gateway]
+                                                )).once
+            end
+
+            context 'with single application_gateway' do
+              # NOTE: The following spec is currently identical/redundant to the '.../with single load_balancer/creates a public IP and assigns it to the primary NIC' spec above. Ideally, each of them SHOULD have distinct expectations, but currently they don't.
+              it 'creates a public IP and assigns it to the primary NIC' do
+                _, vm_params = vm_manager_for_pip.create(bosh_vm_meta, location, vm_props, disk_cids, network_configurator, env, agent_util, network_spec, config)
+                expect(vm_params[:name]).to eq(vm_name)
+                # TODO: Add more expectations here? The expects above only verify that the VM was created, but not that the IP was assigned to the NIC correctly.
               end
 
-              context 'with valid application_gateway config' do
-                before do
-                  expect(azure_client).to receive(:create_public_ip)
-                    .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)
-                  expect(azure_client).to receive(:create_network_interface)
-                    .with(MOCK_RESOURCE_GROUP_NAME, hash_including(
-                                                      name: "#{vm_name}-0",
-                                                      public_ip: dynamic_public_ip,
-                                                      subnet: subnet,
-                                                      tags: tags,
-                                                      load_balancers: [ load_balancer ],
-                                                      application_gateways: [application_gateway]
-                                                    )).once
+              context 'when application_gateway has multiple backend pools' do
+                let(:application_gateway) do
+                  {
+                    name: 'fake-ag-name',
+                    backend_address_pools: [
+                      {
+                        name: 'fake-pool-name',
+                        id: 'fake-pool-id',
+                        provisioning_state: 'fake-pool-state',
+                        backend_ip_configurations: []
+                      },
+                      {
+                        name: 'fake-pool2-name',
+                        id: 'fake-pool2-id',
+                        provisioning_state: 'fake-pool2-state',
+                        backend_ip_configurations: []
+                      }
+                    ]
+                  }
                 end
 
                 context 'when backend_pool_name is not specified' do
@@ -380,46 +387,48 @@ describe Bosh::AzureCloud::VMManager do
                   end
                 end
               end
+            end
 
-              context 'when an invalid backend_pool_name is specified' do
-                let(:vm_properties) do
-                  {
-                    'instance_type' => 'Standard_D1',
-                    'storage_account_name' => 'dfe03ad623f34d42999e93ca',
-                    'caching' => 'ReadWrite',
-                    'load_balancer' => 'fake-lb-name',
-                    'application_gateway' => {
-                      # 'resource_group_name' => 'fake-rg-name',
-                      'name' => 'fake-ag-name',
-                      'backend_pool_name' => 'invalid-pool-name'
-                    }
-                  }
-                end
+            context 'with multiple application_gateways' do
+              # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
+              it 'adds the public IP to each application_gateway'
 
-                it 'should raise an error' do
-                  expect(azure_client).to receive(:create_public_ip)
-                    .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)
-                  expect(azure_client).to receive(:delete_public_ip).with(MOCK_RESOURCE_GROUP_NAME, vm_name)
-                  # NOTE: For some reason, the following mock is needed when a `cloud_error` is raised
-                  allow(azure_client).to receive(:list_network_interfaces_by_keyword)
-                    .with(MOCK_RESOURCE_GROUP_NAME, vm_name)
-                    .and_return([]).once
-
-                  expect do
-                    vm_manager_for_pip.create(bosh_vm_meta, location, vm_props, disk_cids, network_configurator, env, agent_util, network_spec, config)
-                  end.to raise_error(/('fake-ag-name' does not have a backend_pool named 'invalid-pool-name': \{:name=>"fake-ag-name", :backend_address_pools=>\[\{:name=>"fake-pool-name", :id=>"fake-pool-id", ).*/)
-                end
+              context 'when backend_pool_name is specified' do
+                # TODO: issue-644: multi-BEPool-AGW: add unit tests for named-pool AGWs
+                it 'adds the public IP to the specified pool of each application_gateway'
               end
             end
           end
 
-          context 'with multiple application_gateways' do
-            # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
-            it 'adds the public IP to each application_gateway'
+          context 'with invalid application_gateway config' do
+            context 'when an invalid backend_pool_name is specified' do
+              let(:vm_properties) do
+                {
+                  'instance_type' => 'Standard_D1',
+                  'storage_account_name' => 'dfe03ad623f34d42999e93ca',
+                  'caching' => 'ReadWrite',
+                  'load_balancer' => 'fake-lb-name',
+                  'application_gateway' => {
+                    # 'resource_group_name' => 'fake-rg-name',
+                    'name' => 'fake-ag-name',
+                    'backend_pool_name' => 'invalid-pool-name'
+                  }
+                }
+              end
 
-            context 'when backend_pool_name is specified' do
-              # TODO: issue-644: multi-BEPool-AGW: add unit tests for named-pool AGWs
-              it 'adds the public IP to the specified pool of each application_gateway'
+              it 'should raise an error' do
+                expect(azure_client).to receive(:create_public_ip)
+                  .with(MOCK_RESOURCE_GROUP_NAME, public_ip_params)
+                expect(azure_client).to receive(:delete_public_ip).with(MOCK_RESOURCE_GROUP_NAME, vm_name)
+                # NOTE: For some reason, the following mock is needed when a `cloud_error` is raised
+                allow(azure_client).to receive(:list_network_interfaces_by_keyword)
+                  .with(MOCK_RESOURCE_GROUP_NAME, vm_name)
+                  .and_return([]).once
+
+                expect do
+                  vm_manager_for_pip.create(bosh_vm_meta, location, vm_props, disk_cids, network_configurator, env, agent_util, network_spec, config)
+                end.to raise_error(/('fake-ag-name' does not have a backend_pool named 'invalid-pool-name': \{:name=>"fake-ag-name", :backend_address_pools=>\[\{:name=>"fake-pool-name", :id=>"fake-pool-id", ).*/)
+              end
             end
           end
         end
