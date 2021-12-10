@@ -169,4 +169,21 @@ RSpec.configure do |config|
     allow(logger).to receive(:set_request_id).with(MOCK_REQUEST_ID)
     RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 500
   end
+
+  # Disable RSpec output truncation
+  begin
+    # NOTE: None of the following semi-official workarounds for RSpec output truncation actually seem to prevent WebMock "Unregistered request" errors from getting truncated. For example:
+    #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: ...
+
+    # see: https://github.com/rspec/rspec-core/issues/2535#issuecomment-898500368
+    # see: https://github.com/rspec/rspec-expectations/issues/991#issuecomment-571644505
+    # config.expect_with :rspec do |c|
+    #   # c.max_formatted_output_length = 200 # Set to nil to prevent RSpec from doing truncation
+    #   # c.max_formatted_output_length = 1_000_000 # Set to nil to prevent RSpec from doing truncation
+    #   c.max_formatted_output_length = nil # Set to nil to prevent RSpec from doing truncation
+    # end
+
+    # see: https://github.com/rspec/rspec-expectations/issues/991#issuecomment-302863645
+    # RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1_000_000
+  end
 end
