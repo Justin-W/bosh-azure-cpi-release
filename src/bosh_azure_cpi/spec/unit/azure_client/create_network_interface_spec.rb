@@ -269,8 +269,7 @@ describe Bosh::AzureCloud::AzureClient do
         end
       end
 
-      # NOTE: issue-644: unit tests for single-LB, single-pool
-      context 'with load balancer' do
+      context 'with single load balancer' do
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
