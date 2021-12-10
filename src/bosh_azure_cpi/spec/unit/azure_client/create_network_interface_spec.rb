@@ -347,12 +347,8 @@ describe Bosh::AzureCloud::AzureClient do
                     subnet: {
                       id: subnet[:id]
                     },
-                    loadBalancerBackendAddressPools: [
-                      {
-                        id: 'fake-lb-pool-id'
-                      }
-                    ],
-                    loadBalancerInboundNatRules: [{}]
+                    loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                    loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                   }
                 }],
                 dnsSettings: {
