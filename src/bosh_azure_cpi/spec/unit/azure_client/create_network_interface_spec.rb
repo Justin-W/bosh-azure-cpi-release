@@ -733,7 +733,7 @@ describe Bosh::AzureCloud::AzureClient do
         end
       end
 
-      context 'with single application gateway' do
+      context 'with application gateway' do
         let(:request_body) do
           {
             name: nic_params[:name],
@@ -789,42 +789,8 @@ describe Bosh::AzureCloud::AzureClient do
           )
         end
 
-        context 'with single backend pool' do
-          let(:nic_params) do
-            {
-              name: nic_name,
-              location: 'fake-location',
-              ipconfig_name: 'fake-ipconfig-name',
-              subnet: { id: subnet[:id] },
-              tags: {},
-              enable_ip_forwarding: false,
-              enable_accelerated_networking: false,
-              private_ip: '10.0.0.100',
-              dns_servers: ['168.63.129.16'],
-              public_ip: { id: 'fake-public-id' },
-              network_security_group: { id: nsg_id },
-              application_security_groups: [],
-              load_balancers: nil,
-              application_gateways: [{
-                backend_address_pools: [
-                  {
-                    name: 'fake-agw-pool-name',
-                    id: 'fake-agw-pool-id'
-                  }
-                ]
-              }]
-            }
-          end
-
-          it 'should create a network interface without error' do
-            expect do
-              azure_client.create_network_interface(resource_group, nic_params)
-            end.not_to raise_error
-          end
-        end
-
-        context 'with multiple backend pools' do
-          context 'when backend_pool_name is not specified' do
+        context 'with single application gateway' do
+          context 'with single backend pool' do
             let(:nic_params) do
               {
                 name: nic_name,
@@ -840,181 +806,116 @@ describe Bosh::AzureCloud::AzureClient do
                 network_security_group: { id: nsg_id },
                 application_security_groups: [],
                 load_balancers: nil,
-                application_gateways: [
-                  {
-                    backend_address_pools: [
-                      {
-                        name: 'fake-agw-pool-name',
-                        id: 'fake-agw-pool-id'
-                      },
-                      {
-                        name: 'fake-agw-pool2-name',
-                        id: 'fake-agw-pool2-id'
-                      }
-                    ]
-                  }
-                ]
-              }
-            end
-
-            it 'should use the default backend_pools' do
-              expect do
-                azure_client.create_network_interface(resource_group, nic_params)
-              end.not_to raise_error
-            end
-          end
-
-          context 'when backend_pool_name is specified' do
-            let(:nic_params) do
-              {
-                name: nic_name,
-                location: 'fake-location',
-                ipconfig_name: 'fake-ipconfig-name',
-                subnet: { id: subnet[:id] },
-                tags: {},
-                enable_ip_forwarding: false,
-                enable_accelerated_networking: false,
-                private_ip: '10.0.0.100',
-                dns_servers: ['168.63.129.16'],
-                public_ip: { id: 'fake-public-id' },
-                network_security_group: { id: nsg_id },
-                application_security_groups: [],
-                load_balancers: nil,
-                # NOTE: This data would normally be created by the `VMManager._get_application_gateways` method,
-                # which would remove all but the `vm_props`-configured pool from the list.
-                application_gateways: [
-                  {
-                    backend_address_pools: [
-                      # {
-                      #   name: 'fake-agw-pool-name',
-                      #   id: 'fake-agw-pool-id'
-                      # },
-                      {
-                        name: 'fake-agw-pool2-name',
-                        id: 'fake-agw-pool2-id'
-                      }
-                    ]
-                  }
-                ]
-              }
-            end
-
-            it 'should use the specified backend_pools' do
-              expect do
-                azure_client.create_network_interface(resource_group, nic_params)
-              end.not_to raise_error
-            end
-          end
-        end
-
-        # NOTE: This should never happen, since an error would be raised earlier (preventing `azure_client.create_network_interface` from being called)
-        # context 'when an invalid backend_pool_name is specified' do
-        #   it 'should never happen'
-        # end
-      end
-
-      context 'with multiple application gateways' do
-        let(:request_body) do
-          {
-            name: nic_params[:name],
-            location: nic_params[:location],
-            tags: {},
-            properties: {
-              networkSecurityGroup: {
-                id: nic_params[:network_security_group][:id]
-              },
-              enableIPForwarding: false,
-              enableAcceleratedNetworking: false,
-              ipConfigurations: [{
-                name: nic_params[:ipconfig_name],
-                properties: {
-                  privateIPAddress: nic_params[:private_ip],
-                  privateIPAllocationMethod: 'Static',
-                  publicIPAddress: { id: nic_params[:public_ip][:id] },
-                  subnet: {
-                    id: subnet[:id]
-                  },
-                  applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                }
-              }],
-              dnsSettings: {
-                dnsServers: ['168.63.129.16']
-              }
-            }
-          }
-        end
-
-        before do
-          stub_request(:post, token_uri).to_return(
-            status: 200,
-            body: {
-              'access_token' => valid_access_token,
-              'expires_on' => expires_on
-            }.to_json,
-            headers: {}
-          )
-          stub_request(:put, network_interface_uri)
-            .with(body: request_body.to_json)
-            .to_return(
-              status: 200,
-              body: '',
-              headers: {
-                'azure-asyncoperation' => operation_status_link
-              }
-            )
-          stub_request(:get, operation_status_link).to_return(
-            status: 200,
-            body: '{"status":"Succeeded"}',
-            headers: {}
-          )
-        end
-
-        context 'with single backend pool' do
-          let(:nic_params) do
-            {
-              name: nic_name,
-              location: 'fake-location',
-              ipconfig_name: 'fake-ipconfig-name',
-              subnet: { id: subnet[:id] },
-              tags: {},
-              enable_ip_forwarding: false,
-              enable_accelerated_networking: false,
-              private_ip: '10.0.0.100',
-              dns_servers: ['168.63.129.16'],
-              public_ip: { id: 'fake-public-id' },
-              network_security_group: { id: nsg_id },
-              application_security_groups: [],
-              load_balancers: nil,
-              application_gateways: [
-                {
+                application_gateways: [{
                   backend_address_pools: [
                     {
                       name: 'fake-agw-pool-name',
                       id: 'fake-agw-pool-id'
                     }
                   ]
-                },
+                }]
+              }
+            end
+
+            it 'should create a network interface without error' do
+              expect do
+                azure_client.create_network_interface(resource_group, nic_params)
+              end.not_to raise_error
+            end
+          end
+
+          context 'with multiple backend pools' do
+            context 'when backend_pool_name is not specified' do
+              let(:nic_params) do
                 {
-                  backend_address_pools: [
+                  name: nic_name,
+                  location: 'fake-location',
+                  ipconfig_name: 'fake-ipconfig-name',
+                  subnet: { id: subnet[:id] },
+                  tags: {},
+                  enable_ip_forwarding: false,
+                  enable_accelerated_networking: false,
+                  private_ip: '10.0.0.100',
+                  dns_servers: ['168.63.129.16'],
+                  public_ip: { id: 'fake-public-id' },
+                  network_security_group: { id: nsg_id },
+                  application_security_groups: [],
+                  load_balancers: nil,
+                  application_gateways: [
                     {
-                      name: 'fake-agw2-pool-1-name',
-                      id: 'fake-agw2-pool-1-id'
+                      backend_address_pools: [
+                        {
+                          name: 'fake-agw-pool-name',
+                          id: 'fake-agw-pool-id'
+                        },
+                        {
+                          name: 'fake-agw-pool2-name',
+                          id: 'fake-agw-pool2-id'
+                        }
+                      ]
                     }
                   ]
                 }
-              ]
-            }
+              end
+
+              it 'should use the default backend_pools' do
+                expect do
+                  azure_client.create_network_interface(resource_group, nic_params)
+                end.not_to raise_error
+              end
+            end
+
+            context 'when backend_pool_name is specified' do
+              let(:nic_params) do
+                {
+                  name: nic_name,
+                  location: 'fake-location',
+                  ipconfig_name: 'fake-ipconfig-name',
+                  subnet: { id: subnet[:id] },
+                  tags: {},
+                  enable_ip_forwarding: false,
+                  enable_accelerated_networking: false,
+                  private_ip: '10.0.0.100',
+                  dns_servers: ['168.63.129.16'],
+                  public_ip: { id: 'fake-public-id' },
+                  network_security_group: { id: nsg_id },
+                  application_security_groups: [],
+                  load_balancers: nil,
+                  # NOTE: This data would normally be created by the `VMManager._get_application_gateways` method,
+                  # which would remove all but the `vm_props`-configured pool from the list.
+                  application_gateways: [
+                    {
+                      backend_address_pools: [
+                        # {
+                        #   name: 'fake-agw-pool-name',
+                        #   id: 'fake-agw-pool-id'
+                        # },
+                        {
+                          name: 'fake-agw-pool2-name',
+                          id: 'fake-agw-pool2-id'
+                        }
+                      ]
+                    }
+                  ]
+                }
+              end
+
+              it 'should use the specified backend_pools' do
+                expect do
+                  azure_client.create_network_interface(resource_group, nic_params)
+                end.not_to raise_error
+              end
+            end
           end
 
-          it 'should create a network interface without error' do
-            expect do
-              azure_client.create_network_interface(resource_group, nic_params)
-            end.not_to raise_error
-          end
+          # NOTE: This should never happen, since an error would be raised earlier (preventing `azure_client.create_network_interface` from being called)
+          # context 'when an invalid backend_pool_name is specified' do
+          #   it 'should never happen'
+          # end
         end
 
-        context 'with multiple backend pools' do
-          context 'when backend_pool_name is not specified' do
+        context 'with multiple application gateways' do
+          context 'with single backend pool' do
             let(:nic_params) do
               {
                 name: nic_name,
@@ -1036,10 +937,6 @@ describe Bosh::AzureCloud::AzureClient do
                       {
                         name: 'fake-agw-pool-name',
                         id: 'fake-agw-pool-id'
-                      },
-                      {
-                        name: 'fake-agw-pool2-name',
-                        id: 'fake-agw-pool2-id'
                       }
                     ]
                   },
@@ -1048,10 +945,6 @@ describe Bosh::AzureCloud::AzureClient do
                       {
                         name: 'fake-agw2-pool-1-name',
                         id: 'fake-agw2-pool-1-id'
-                      },
-                      {
-                        name: 'fake-agw2-pool-2-name',
-                        id: 'fake-agw2-pool-2-id'
                       }
                     ]
                   }
@@ -1059,64 +952,118 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            it 'should use the default backend_pools' do
+            it 'should create a network interface without error' do
               expect do
                 azure_client.create_network_interface(resource_group, nic_params)
               end.not_to raise_error
             end
           end
 
-          context 'when backend_pool_name is specified' do
-            let(:nic_params) do
-              {
-                name: nic_name,
-                location: 'fake-location',
-                ipconfig_name: 'fake-ipconfig-name',
-                subnet: { id: subnet[:id] },
-                tags: {},
-                enable_ip_forwarding: false,
-                enable_accelerated_networking: false,
-                private_ip: '10.0.0.100',
-                dns_servers: ['168.63.129.16'],
-                public_ip: { id: 'fake-public-id' },
-                network_security_group: { id: nsg_id },
-                application_security_groups: [],
-                load_balancers: nil,
-                # NOTE: This data would normally be created by the `VMManager._get_application_gateways` method,
-                # which would remove all but the `vm_props`-configured pools from the list.
-                application_gateways: [
-                  {
-                    backend_address_pools: [
-                      # {
-                      #   name: 'fake-agw-pool-name',
-                      #   id: 'fake-agw-pool-id'
-                      # },
-                      {
-                        name: 'fake-agw-pool2-name',
-                        id: 'fake-agw-pool2-id'
-                      }
-                    ]
-                  },
-                  {
-                    backend_address_pools: [
-                      # {
-                      #   name: 'fake-agw2-pool-1-name',
-                      #   id: 'fake-agw2-pool-1-id'
-                      # },
-                      {
-                        name: 'fake-agw2-pool-2-name',
-                        id: 'fake-agw2-pool-2-id'
-                      }
-                    ]
-                  }
-                ]
-              }
+          context 'with multiple backend pools' do
+            context 'when backend_pool_name is not specified' do
+              let(:nic_params) do
+                {
+                  name: nic_name,
+                  location: 'fake-location',
+                  ipconfig_name: 'fake-ipconfig-name',
+                  subnet: { id: subnet[:id] },
+                  tags: {},
+                  enable_ip_forwarding: false,
+                  enable_accelerated_networking: false,
+                  private_ip: '10.0.0.100',
+                  dns_servers: ['168.63.129.16'],
+                  public_ip: { id: 'fake-public-id' },
+                  network_security_group: { id: nsg_id },
+                  application_security_groups: [],
+                  load_balancers: nil,
+                  application_gateways: [
+                    {
+                      backend_address_pools: [
+                        {
+                          name: 'fake-agw-pool-name',
+                          id: 'fake-agw-pool-id'
+                        },
+                        {
+                          name: 'fake-agw-pool2-name',
+                          id: 'fake-agw-pool2-id'
+                        }
+                      ]
+                    },
+                    {
+                      backend_address_pools: [
+                        {
+                          name: 'fake-agw2-pool-1-name',
+                          id: 'fake-agw2-pool-1-id'
+                        },
+                        {
+                          name: 'fake-agw2-pool-2-name',
+                          id: 'fake-agw2-pool-2-id'
+                        }
+                      ]
+                    }
+                  ]
+                }
+              end
+
+              it 'should use the default backend_pools' do
+                expect do
+                  azure_client.create_network_interface(resource_group, nic_params)
+                end.not_to raise_error
+              end
             end
 
-            it 'should use the specified backend_pools' do
-              expect do
-                azure_client.create_network_interface(resource_group, nic_params)
-              end.not_to raise_error
+            context 'when backend_pool_name is specified' do
+              let(:nic_params) do
+                {
+                  name: nic_name,
+                  location: 'fake-location',
+                  ipconfig_name: 'fake-ipconfig-name',
+                  subnet: { id: subnet[:id] },
+                  tags: {},
+                  enable_ip_forwarding: false,
+                  enable_accelerated_networking: false,
+                  private_ip: '10.0.0.100',
+                  dns_servers: ['168.63.129.16'],
+                  public_ip: { id: 'fake-public-id' },
+                  network_security_group: { id: nsg_id },
+                  application_security_groups: [],
+                  load_balancers: nil,
+                  # NOTE: This data would normally be created by the `VMManager._get_application_gateways` method,
+                  # which would remove all but the `vm_props`-configured pools from the list.
+                  application_gateways: [
+                    {
+                      backend_address_pools: [
+                        # {
+                        #   name: 'fake-agw-pool-name',
+                        #   id: 'fake-agw-pool-id'
+                        # },
+                        {
+                          name: 'fake-agw-pool2-name',
+                          id: 'fake-agw-pool2-id'
+                        }
+                      ]
+                    },
+                    {
+                      backend_address_pools: [
+                        # {
+                        #   name: 'fake-agw2-pool-1-name',
+                        #   id: 'fake-agw2-pool-1-id'
+                        # },
+                        {
+                          name: 'fake-agw2-pool-2-name',
+                          id: 'fake-agw2-pool-2-id'
+                        }
+                      ]
+                    }
+                  ]
+                }
+              end
+
+              it 'should use the specified backend_pools' do
+                expect do
+                  azure_client.create_network_interface(resource_group, nic_params)
+                end.not_to raise_error
+              end
             end
           end
         end
