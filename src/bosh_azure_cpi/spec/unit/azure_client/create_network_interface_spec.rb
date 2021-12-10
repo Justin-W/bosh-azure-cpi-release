@@ -547,7 +547,7 @@ describe Bosh::AzureCloud::AzureClient do
         # end
       end
 
-      context 'with multiple load balancers' do # rubocop:disable RSpec/RepeatedExampleGroupBody
+      context 'with multiple load balancers' do
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
@@ -1216,7 +1216,7 @@ describe Bosh::AzureCloud::AzureClient do
         # end
       end
 
-      context 'with multiple application gateways' do # rubocop:disable RSpec/RepeatedExampleGroupBody
+      context 'with multiple application gateways' do
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
