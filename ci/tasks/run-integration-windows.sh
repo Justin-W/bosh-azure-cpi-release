@@ -33,7 +33,6 @@ export BOSH_AZURE_APPLICATION_SECURITY_GROUP=$(echo ${metadata} | jq -e --raw-ou
 # TODO: issue-644: multi-AGW: Review: Are changes needed here for multi-AGWs? (Seems like this code reads the TF Outputs from 'ci/assets/terraform/integration/*.tf'?)
 # TODO: issue-644: multi-BEPool-AGW: Review: Are changes needed here for multi-pool AGWs? (Seems like this code reads the TF Outputs from 'ci/assets/terraform/integration/*.tf'?)
 export BOSH_AZURE_APPLICATION_GATEWAY_NAME=$(echo ${metadata} | jq -e --raw-output ".application_gateway_name")
-export BOSH_AZURE_APPLICATION_GATEWAY_BACKEND_POOL_NAME=$(echo ${metadata} | jq -e --raw-output ".application_gateway_backend_address_pool_name")
 export BOSH_AZURE_DEFAULT_USER_ASSIGNED_IDENTITY_NAME=$(echo ${metadata} | jq -e --raw-output ".default_user_assigned_identity_name")
 export BOSH_AZURE_USER_ASSIGNED_IDENTITY_NAME=$(echo ${metadata} | jq -e --raw-output ".user_assigned_identity_name")
 export BOSH_AZURE_SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY}
