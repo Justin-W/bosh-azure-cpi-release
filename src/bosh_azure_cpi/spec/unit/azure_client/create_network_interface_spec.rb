@@ -542,10 +542,10 @@ describe Bosh::AzureCloud::AzureClient do
           end
         end
 
-        context 'when an invalid backend_pool_name is specified' do
-          # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
-          it 'should raise an error'
-        end
+        # NOTE: This should never happen, since an error would be raised earlier (preventing `azure_client.create_network_interface` from being called)
+        # context 'when an invalid backend_pool_name is specified' do
+        #   it 'should never happen'
+        # end
       end
 
       context 'with multiple load balancers' do # rubocop:disable RSpec/RepeatedExampleGroupBody
