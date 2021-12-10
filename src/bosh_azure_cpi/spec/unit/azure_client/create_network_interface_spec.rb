@@ -290,7 +290,7 @@ describe Bosh::AzureCloud::AzureClient do
                   subnet: {
                     id: subnet[:id]
                   },
-                  loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                  loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { id: lb[:backend_address_pools][0][:id] } },
                   loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                 }
               }],
@@ -754,7 +754,7 @@ describe Bosh::AzureCloud::AzureClient do
                   subnet: {
                     id: subnet[:id]
                   },
-                  applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
+                  applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { id: agw[:backend_address_pools][0][:id] } }
                 }
               }],
               dnsSettings: {
