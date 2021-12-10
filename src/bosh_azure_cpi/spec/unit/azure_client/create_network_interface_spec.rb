@@ -868,7 +868,8 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
+            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
+            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
             it 'should use the specified backend_pools'
             # it 'should use the specified backend_pools' do
             #   expect do
