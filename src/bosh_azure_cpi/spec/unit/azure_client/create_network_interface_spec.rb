@@ -394,7 +394,7 @@ describe Bosh::AzureCloud::AzureClient do
                   ],
                   frontend_ip_configurations: [
                     {
-                      inbound_nat_rules: [{}, {}]
+                      inbound_nat_rules: [{}]
                     }
                   ]
                 }],
@@ -470,7 +470,7 @@ describe Bosh::AzureCloud::AzureClient do
                   ],
                   frontend_ip_configurations: [
                     {
-                      inbound_nat_rules: [{}, {}]
+                      inbound_nat_rules: [{}]
                     }
                   ]
                 }],
@@ -574,7 +574,7 @@ describe Bosh::AzureCloud::AzureClient do
                   ],
                   frontend_ip_configurations: [
                     {
-                      inbound_nat_rules: [{}, {}]
+                      inbound_nat_rules: [{}]
                     }
                   ]
                 },
@@ -587,7 +587,7 @@ describe Bosh::AzureCloud::AzureClient do
                   ],
                   frontend_ip_configurations: [
                     {
-                      inbound_nat_rules: [{}, {}]
+                      inbound_nat_rules: [{}]
                     }
                   ]
                 }
@@ -664,7 +664,7 @@ describe Bosh::AzureCloud::AzureClient do
                     ],
                     frontend_ip_configurations: [
                       {
-                        inbound_nat_rules: [{}, {}]
+                        inbound_nat_rules: [{}]
                       }
                     ]
                   },
@@ -681,7 +681,7 @@ describe Bosh::AzureCloud::AzureClient do
                     ],
                     frontend_ip_configurations: [
                       {
-                        inbound_nat_rules: [{}, {}]
+                        inbound_nat_rules: [{}]
                       }
                     ]
                   }
@@ -759,7 +759,7 @@ describe Bosh::AzureCloud::AzureClient do
                     ],
                     frontend_ip_configurations: [
                       {
-                        inbound_nat_rules: [{}, {}]
+                        inbound_nat_rules: [{}]
                       }
                     ]
                   },
@@ -776,7 +776,7 @@ describe Bosh::AzureCloud::AzureClient do
                     ],
                     frontend_ip_configurations: [
                       {
-                        inbound_nat_rules: [{}, {}]
+                        inbound_nat_rules: [{}]
                       }
                     ]
                   }
