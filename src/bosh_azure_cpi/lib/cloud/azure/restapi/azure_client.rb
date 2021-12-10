@@ -1550,8 +1550,6 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/network/delete-a-network-interface-card
     #
     def delete_network_interface(resource_group_name, name)
-      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
-      # TODO: issue-644: multi-BEPool-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateway Backend Address Pools?
       @logger.debug("delete_network_interface - trying to delete #{name} from resource group #{resource_group_name}")
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES, resource_group_name: resource_group_name, name: name)
       http_delete(url)
