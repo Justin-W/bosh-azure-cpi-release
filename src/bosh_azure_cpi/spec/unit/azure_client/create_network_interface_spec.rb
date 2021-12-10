@@ -625,6 +625,62 @@ describe Bosh::AzureCloud::AzureClient do
           end
 
           context 'when backend_pool_name is specified' do
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                # NOTE: This data would normally be created by the `VMManager._get_load_balancers` method,
+                # which would remove all but the `vm_props`-configured pools from the list.
+                load_balancers: [
+                  {
+                    backend_address_pools: [
+                      # {
+                      #   name: 'fake-lb-pool-name',
+                      #   id: 'fake-lb-pool-id'
+                      # },
+                      {
+                        name: 'fake-lb-pool2-name',
+                        id: 'fake-lb-pool2-id'
+                      }
+                    ],
+                    frontend_ip_configurations: [
+                      {
+                        inbound_nat_rules: [{}, {}]
+                      }
+                    ]
+                  },
+                  {
+                    backend_address_pools: [
+                      # {
+                      #   name: 'fake-lb2-pool-1-name',
+                      #   id: 'fake-lb2-pool-1-id'
+                      # },
+                      {
+                        name: 'fake-lb2-pool-2-name',
+                        id: 'fake-lb2-pool-2-id'
+                      }
+                    ],
+                    frontend_ip_configurations: [
+                      {
+                        inbound_nat_rules: [{}, {}]
+                      }
+                    ]
+                  }
+                ],
+                application_gateways: nil
+              }
+            end
+
             # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
             it 'should use the specified backend_pools'
             # it 'should use the specified backend_pools' do
