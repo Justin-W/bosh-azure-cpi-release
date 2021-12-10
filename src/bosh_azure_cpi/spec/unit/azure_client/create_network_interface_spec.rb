@@ -1229,6 +1229,42 @@ describe Bosh::AzureCloud::AzureClient do
 
       context 'with multiple application gateways' do # rubocop:disable RSpec/RepeatedExampleGroupBody
         context 'with single backend pool' do
+          let(:nic_params) do
+            {
+              name: nic_name,
+              location: 'fake-location',
+              ipconfig_name: 'fake-ipconfig-name',
+              subnet: { id: subnet[:id] },
+              tags: {},
+              enable_ip_forwarding: false,
+              enable_accelerated_networking: false,
+              private_ip: '10.0.0.100',
+              dns_servers: ['168.63.129.16'],
+              public_ip: { id: 'fake-public-id' },
+              network_security_group: { id: nsg_id },
+              application_security_groups: [],
+              load_balancers: nil,
+              application_gateways: [
+                {
+                  backend_address_pools: [
+                    {
+                      name: 'fake-agw-pool-name',
+                      id: 'fake-agw-pool-id'
+                    }
+                  ]
+                },
+                {
+                  backend_address_pools: [
+                    {
+                      name: 'fake-agw2-pool-1-name',
+                      id: 'fake-agw2-pool-1-id'
+                    }
+                  ]
+                }
+              ]
+            }
+          end
+
           # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
           it 'should create a network interface without error'
           # it 'should create a network interface without error' do
