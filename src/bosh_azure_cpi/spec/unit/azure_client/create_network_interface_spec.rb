@@ -788,6 +788,36 @@ describe Bosh::AzureCloud::AzureClient do
       end
 
       context 'with single application gateway' do
+        let(:request_body) do
+          {
+            name: nic_params[:name],
+            location: nic_params[:location],
+            tags: {},
+            properties: {
+              networkSecurityGroup: {
+                id: nic_params[:network_security_group][:id]
+              },
+              enableIPForwarding: false,
+              enableAcceleratedNetworking: false,
+              ipConfigurations: [{
+                name: nic_params[:ipconfig_name],
+                properties: {
+                  privateIPAddress: nic_params[:private_ip],
+                  privateIPAllocationMethod: 'Static',
+                  publicIPAddress: { id: nic_params[:public_ip][:id] },
+                  subnet: {
+                    id: subnet[:id]
+                  },
+                  applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
+                }
+              }],
+              dnsSettings: {
+                dnsServers: ['168.63.129.16']
+              }
+            }
+          }
+        end
+
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
@@ -839,35 +869,6 @@ describe Bosh::AzureCloud::AzureClient do
               }]
             }
           end
-          let(:request_body) do
-            {
-              name: nic_params[:name],
-              location: nic_params[:location],
-              tags: {},
-              properties: {
-                networkSecurityGroup: {
-                  id: nic_params[:network_security_group][:id]
-                },
-                enableIPForwarding: false,
-                enableAcceleratedNetworking: false,
-                ipConfigurations: [{
-                  name: nic_params[:ipconfig_name],
-                  properties: {
-                    privateIPAddress: nic_params[:private_ip],
-                    privateIPAllocationMethod: 'Static',
-                    publicIPAddress: { id: nic_params[:public_ip][:id] },
-                    subnet: {
-                      id: subnet[:id]
-                    },
-                    applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                  }
-                }],
-                dnsSettings: {
-                  dnsServers: ['168.63.129.16']
-                }
-              }
-            }
-          end
 
           it 'should create a network interface without error' do
             expect do
@@ -907,35 +908,6 @@ describe Bosh::AzureCloud::AzureClient do
                     ]
                   }
                 ]
-              }
-            end
-            let(:request_body) do
-              {
-                name: nic_params[:name],
-                location: nic_params[:location],
-                tags: {},
-                properties: {
-                  networkSecurityGroup: {
-                    id: nic_params[:network_security_group][:id]
-                  },
-                  enableIPForwarding: false,
-                  enableAcceleratedNetworking: false,
-                  ipConfigurations: [{
-                    name: nic_params[:ipconfig_name],
-                    properties: {
-                      privateIPAddress: nic_params[:private_ip],
-                      privateIPAllocationMethod: 'Static',
-                      publicIPAddress: { id: nic_params[:public_ip][:id] },
-                      subnet: {
-                        id: subnet[:id]
-                      },
-                      applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                    }
-                  }],
-                  dnsSettings: {
-                    dnsServers: ['168.63.129.16']
-                  }
-                }
               }
             end
 
@@ -980,35 +952,6 @@ describe Bosh::AzureCloud::AzureClient do
                 ]
               }
             end
-            let(:request_body) do
-              {
-                name: nic_params[:name],
-                location: nic_params[:location],
-                tags: {},
-                properties: {
-                  networkSecurityGroup: {
-                    id: nic_params[:network_security_group][:id]
-                  },
-                  enableIPForwarding: false,
-                  enableAcceleratedNetworking: false,
-                  ipConfigurations: [{
-                    name: nic_params[:ipconfig_name],
-                    properties: {
-                      privateIPAddress: nic_params[:private_ip],
-                      privateIPAllocationMethod: 'Static',
-                      publicIPAddress: { id: nic_params[:public_ip][:id] },
-                      subnet: {
-                        id: subnet[:id]
-                      },
-                      applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                    }
-                  }],
-                  dnsSettings: {
-                    dnsServers: ['168.63.129.16']
-                  }
-                }
-              }
-            end
 
             it 'should use the specified backend_pools' do
               expect do
@@ -1025,6 +968,36 @@ describe Bosh::AzureCloud::AzureClient do
       end
 
       context 'with multiple application gateways' do
+        let(:request_body) do
+          {
+            name: nic_params[:name],
+            location: nic_params[:location],
+            tags: {},
+            properties: {
+              networkSecurityGroup: {
+                id: nic_params[:network_security_group][:id]
+              },
+              enableIPForwarding: false,
+              enableAcceleratedNetworking: false,
+              ipConfigurations: [{
+                name: nic_params[:ipconfig_name],
+                properties: {
+                  privateIPAddress: nic_params[:private_ip],
+                  privateIPAllocationMethod: 'Static',
+                  publicIPAddress: { id: nic_params[:public_ip][:id] },
+                  subnet: {
+                    id: subnet[:id]
+                  },
+                  applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
+                }
+              }],
+              dnsSettings: {
+                dnsServers: ['168.63.129.16']
+              }
+            }
+          }
+        end
+
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
@@ -1086,35 +1059,6 @@ describe Bosh::AzureCloud::AzureClient do
               ]
             }
           end
-          let(:request_body) do
-            {
-              name: nic_params[:name],
-              location: nic_params[:location],
-              tags: {},
-              properties: {
-                networkSecurityGroup: {
-                  id: nic_params[:network_security_group][:id]
-                },
-                enableIPForwarding: false,
-                enableAcceleratedNetworking: false,
-                ipConfigurations: [{
-                  name: nic_params[:ipconfig_name],
-                  properties: {
-                    privateIPAddress: nic_params[:private_ip],
-                    privateIPAllocationMethod: 'Static',
-                    publicIPAddress: { id: nic_params[:public_ip][:id] },
-                    subnet: {
-                      id: subnet[:id]
-                    },
-                    applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                  }
-                }],
-                dnsSettings: {
-                  dnsServers: ['168.63.129.16']
-                }
-              }
-            }
-          end
 
           it 'should create a network interface without error' do
             expect do
@@ -1166,35 +1110,6 @@ describe Bosh::AzureCloud::AzureClient do
                     ]
                   }
                 ]
-              }
-            end
-            let(:request_body) do
-              {
-                name: nic_params[:name],
-                location: nic_params[:location],
-                tags: {},
-                properties: {
-                  networkSecurityGroup: {
-                    id: nic_params[:network_security_group][:id]
-                  },
-                  enableIPForwarding: false,
-                  enableAcceleratedNetworking: false,
-                  ipConfigurations: [{
-                    name: nic_params[:ipconfig_name],
-                    properties: {
-                      privateIPAddress: nic_params[:private_ip],
-                      privateIPAllocationMethod: 'Static',
-                      publicIPAddress: { id: nic_params[:public_ip][:id] },
-                      subnet: {
-                        id: subnet[:id]
-                      },
-                      applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                    }
-                  }],
-                  dnsSettings: {
-                    dnsServers: ['168.63.129.16']
-                  }
-                }
               }
             end
 
@@ -1249,35 +1164,6 @@ describe Bosh::AzureCloud::AzureClient do
                     ]
                   }
                 ]
-              }
-            end
-            let(:request_body) do
-              {
-                name: nic_params[:name],
-                location: nic_params[:location],
-                tags: {},
-                properties: {
-                  networkSecurityGroup: {
-                    id: nic_params[:network_security_group][:id]
-                  },
-                  enableIPForwarding: false,
-                  enableAcceleratedNetworking: false,
-                  ipConfigurations: [{
-                    name: nic_params[:ipconfig_name],
-                    properties: {
-                      privateIPAddress: nic_params[:private_ip],
-                      privateIPAllocationMethod: 'Static',
-                      publicIPAddress: { id: nic_params[:public_ip][:id] },
-                      subnet: {
-                        id: subnet[:id]
-                      },
-                      applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
-                    }
-                  }],
-                  dnsSettings: {
-                    dnsServers: ['168.63.129.16']
-                  }
-                }
               }
             end
 
