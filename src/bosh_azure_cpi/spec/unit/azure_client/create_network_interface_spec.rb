@@ -1240,6 +1240,50 @@ describe Bosh::AzureCloud::AzureClient do
 
         context 'with multiple backend pools' do
           context 'when backend_pool_name is not specified' do
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                load_balancers: nil,
+                application_gateways: [
+                  {
+                    backend_address_pools: [
+                      {
+                        name: 'fake-agw-pool-name',
+                        id: 'fake-agw-pool-id'
+                      },
+                      {
+                        name: 'fake-agw-pool2-name',
+                        id: 'fake-agw-pool2-id'
+                      }
+                    ]
+                  },
+                  {
+                    backend_address_pools: [
+                      {
+                        name: 'fake-agw2-pool-1-name',
+                        id: 'fake-agw2-pool-1-id'
+                      },
+                      {
+                        name: 'fake-agw2-pool-2-name',
+                        id: 'fake-agw2-pool-2-id'
+                      }
+                    ]
+                  }
+                ]
+              }
+            end
+
             # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
             it 'should use the default backend_pools'
             # it 'should use the default backend_pools' do
