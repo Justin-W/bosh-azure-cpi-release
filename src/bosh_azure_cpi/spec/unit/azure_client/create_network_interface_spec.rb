@@ -269,8 +269,7 @@ describe Bosh::AzureCloud::AzureClient do
         end
       end
 
-      # NOTE: issue-644: unit tests for single-LB, single-pool
-      context 'with load balancer' do
+      context 'with single load balancer' do
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
@@ -371,32 +370,511 @@ describe Bosh::AzureCloud::AzureClient do
         end
 
         context 'with multiple backend pools' do
-          # TODO: issue-644: multi-BEPool-LB: add unit tests for multi-pool LBs
-          it 'should create a network interface without error'
+          context 'when backend_pool_name is not specified' do
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                load_balancers: [{
+                  backend_address_pools: [
+                    {
+                      name: 'fake-lb-pool-name',
+                      id: 'fake-lb-pool-id'
+                    },
+                    {
+                      name: 'fake-lb-pool2-name',
+                      id: 'fake-lb-pool2-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                }],
+                application_gateways: nil
+              }
+            end
+
+            let(:request_body) do
+              {
+                name: nic_params[:name],
+                location: nic_params[:location],
+                tags: {},
+                properties: {
+                  networkSecurityGroup: {
+                    id: nic_params[:network_security_group][:id]
+                  },
+                  enableIPForwarding: false,
+                  enableAcceleratedNetworking: false,
+                  ipConfigurations: [{
+                    name: nic_params[:ipconfig_name],
+                    properties: {
+                      privateIPAddress: nic_params[:private_ip],
+                      privateIPAllocationMethod: 'Static',
+                      publicIPAddress: { id: nic_params[:public_ip][:id] },
+                      subnet: {
+                        id: subnet[:id]
+                      },
+                      loadBalancerBackendAddressPools: [
+                        {
+                          id: 'fake-lb-pool-id'
+                        },
+                        {
+                          id: 'fake-lb-pool2-id'
+                        }
+                      ],
+                      loadBalancerInboundNatRules: [{}]
+                    }
+                  }],
+                  dnsSettings: {
+                    dnsServers: ['168.63.129.16']
+                  }
+                }
+              }
+            end
+
+            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
+            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
+            it 'should use the default backend_pools'
+            # it 'should use the default backend_pools' do
+            #   expect do
+            #     azure_client.create_network_interface(resource_group, nic_params)
+            #   end.not_to raise_error
+            # end
+          end
 
           context 'when backend_pool_name is specified' do
-            # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
-            it 'should use the specified backend_pool'
-          end
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                # NOTE: This data would normally be created by the `VMManager._get_load_balancers` method,
+                # which would remove all but the `vm_props`-configured pool from the list.
+                load_balancers: [{
+                  backend_address_pools: [
+                    # {
+                    #   name: 'fake-lb-pool-name',
+                    #   id: 'fake-lb-pool-id'
+                    # },
+                    {
+                      name: 'fake-lb-pool2-name',
+                      id: 'fake-lb-pool2-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                }],
+                application_gateways: nil
+              }
+            end
 
-          context 'when an invalid backend_pool_name is specified' do
-            # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
-            it 'should raise an error'
+            let(:request_body) do
+              {
+                name: nic_params[:name],
+                location: nic_params[:location],
+                tags: {},
+                properties: {
+                  networkSecurityGroup: {
+                    id: nic_params[:network_security_group][:id]
+                  },
+                  enableIPForwarding: false,
+                  enableAcceleratedNetworking: false,
+                  ipConfigurations: [{
+                    name: nic_params[:ipconfig_name],
+                    properties: {
+                      privateIPAddress: nic_params[:private_ip],
+                      privateIPAllocationMethod: 'Static',
+                      publicIPAddress: { id: nic_params[:public_ip][:id] },
+                      subnet: {
+                        id: subnet[:id]
+                      },
+                      loadBalancerBackendAddressPools: [
+                        {
+                          id: 'fake-lb-pool-id'
+                        },
+                        {
+                          id: 'fake-lb-pool2-id'
+                        }
+                      ],
+                      loadBalancerInboundNatRules: [{}]
+                    }
+                  }],
+                  dnsSettings: {
+                    dnsServers: ['168.63.129.16']
+                  }
+                }
+              }
+            end
+
+            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
+            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
+            it 'should use the specified backend_pools'
+            # it 'should use the specified backend_pools' do
+            #   expect do
+            #     azure_client.create_network_interface(resource_group, nic_params)
+            #   end.not_to raise_error
+            # end
           end
         end
+
+        # NOTE: This should never happen, since an error would be raised earlier (preventing `azure_client.create_network_interface` from being called)
+        # context 'when an invalid backend_pool_name is specified' do
+        #   it 'should never happen'
+        # end
       end
 
       context 'with multiple load balancers' do # rubocop:disable RSpec/RepeatedExampleGroupBody
-        # TODO: issue-644: multi-LB: add unit tests for multi-LBs
-        it 'should create a network interface without error'
+        before do
+          stub_request(:post, token_uri).to_return(
+            status: 200,
+            body: {
+              'access_token' => valid_access_token,
+              'expires_on' => expires_on
+            }.to_json,
+            headers: {}
+          )
+          stub_request(:put, network_interface_uri)
+            .with(body: request_body.to_json)
+            .to_return(
+              status: 200,
+              body: '',
+              headers: {
+                'azure-asyncoperation' => operation_status_link
+              }
+            )
+          stub_request(:get, operation_status_link).to_return(
+            status: 200,
+            body: '{"status":"Succeeded"}',
+            headers: {}
+          )
+        end
+
+        context 'with single backend pool' do
+          let(:nic_params) do
+            {
+              name: nic_name,
+              location: 'fake-location',
+              ipconfig_name: 'fake-ipconfig-name',
+              subnet: { id: subnet[:id] },
+              tags: {},
+              enable_ip_forwarding: false,
+              enable_accelerated_networking: false,
+              private_ip: '10.0.0.100',
+              dns_servers: ['168.63.129.16'],
+              public_ip: { id: 'fake-public-id' },
+              network_security_group: { id: nsg_id },
+              application_security_groups: [],
+              load_balancers: [
+                {
+                  backend_address_pools: [
+                    {
+                      name: 'fake-lb-pool-name',
+                      id: 'fake-lb-pool-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                },
+                {
+                  backend_address_pools: [
+                    {
+                      name: 'fake-lb2-pool-1-name',
+                      id: 'fake-lb2-pool-1-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                }
+              ],
+              application_gateways: nil
+            }
+          end
+
+          let(:request_body) do
+            {
+              name: nic_params[:name],
+              location: nic_params[:location],
+              tags: {},
+              properties: {
+                networkSecurityGroup: {
+                  id: nic_params[:network_security_group][:id]
+                },
+                enableIPForwarding: false,
+                enableAcceleratedNetworking: false,
+                ipConfigurations: [{
+                  name: nic_params[:ipconfig_name],
+                  properties: {
+                    privateIPAddress: nic_params[:private_ip],
+                    privateIPAllocationMethod: 'Static',
+                    publicIPAddress: { id: nic_params[:public_ip][:id] },
+                    subnet: {
+                      id: subnet[:id]
+                    },
+                    loadBalancerBackendAddressPools: [
+                      {
+                        id: 'fake-lb-pool-id'
+                      },
+                      {
+                        id: 'fake-lb2-pool-1-id'
+                      }
+                    ],
+                    loadBalancerInboundNatRules: [{}]
+                  }
+                }],
+                dnsSettings: {
+                  dnsServers: ['168.63.129.16']
+                }
+              }
+            }
+          end
+
+          # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
+          #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
+          it 'should create a network interface without error'
+          # it 'should create a network interface without error' do
+          #   expect do
+          #     azure_client.create_network_interface(resource_group, nic_params)
+          #   end.not_to raise_error
+          # end
+        end
 
         context 'with multiple backend pools' do
-          # TODO: issue-644: multi-BEPool-LB: add unit tests for multi-pool LBs
-          it 'should create a network interface without error'
+          context 'when backend_pool_name is not specified' do
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                load_balancers: [
+                  {
+                    backend_address_pools: [
+                      {
+                        name: 'fake-lb-pool-name',
+                        id: 'fake-lb-pool-id'
+                      },
+                      {
+                        name: 'fake-lb-pool2-name',
+                        id: 'fake-lb-pool2-id'
+                      }
+                    ],
+                    frontend_ip_configurations: [
+                      {
+                        inbound_nat_rules: [{}, {}]
+                      }
+                    ]
+                  },
+                  {
+                    backend_address_pools: [
+                      {
+                        name: 'fake-lb2-pool-1-name',
+                        id: 'fake-lb2-pool-1-id'
+                      },
+                      {
+                        name: 'fake-lb2-pool-2-name',
+                        id: 'fake-lb2-pool-2-id'
+                      }
+                    ],
+                    frontend_ip_configurations: [
+                      {
+                        inbound_nat_rules: [{}, {}]
+                      }
+                    ]
+                  }
+                ],
+                application_gateways: nil
+              }
+            end
+
+            let(:request_body) do
+              {
+                name: nic_params[:name],
+                location: nic_params[:location],
+                tags: {},
+                properties: {
+                  networkSecurityGroup: {
+                    id: nic_params[:network_security_group][:id]
+                  },
+                  enableIPForwarding: false,
+                  enableAcceleratedNetworking: false,
+                  ipConfigurations: [{
+                    name: nic_params[:ipconfig_name],
+                    properties: {
+                      privateIPAddress: nic_params[:private_ip],
+                      privateIPAllocationMethod: 'Static',
+                      publicIPAddress: { id: nic_params[:public_ip][:id] },
+                      subnet: {
+                        id: subnet[:id]
+                      },
+                      loadBalancerBackendAddressPools: [
+                        {
+                          id: 'fake-lb-pool-id'
+                        },
+                        {
+                          id: 'fake-lb2-pool-1-id'
+                        }
+                      ],
+                      loadBalancerInboundNatRules: [{}]
+                    }
+                  }],
+                  dnsSettings: {
+                    dnsServers: ['168.63.129.16']
+                  }
+                }
+              }
+            end
+
+            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
+            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
+            it 'should use the default backend_pools'
+            # it 'should use the default backend_pools' do
+            #   expect do
+            #     azure_client.create_network_interface(resource_group, nic_params)
+            #   end.not_to raise_error
+            # end
+          end
 
           context 'when backend_pool_name is specified' do
-            # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
-            it 'should use the specified backend_pool'
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                # NOTE: This data would normally be created by the `VMManager._get_load_balancers` method,
+                # which would remove all but the `vm_props`-configured pools from the list.
+                load_balancers: [
+                  {
+                    backend_address_pools: [
+                      # {
+                      #   name: 'fake-lb-pool-name',
+                      #   id: 'fake-lb-pool-id'
+                      # },
+                      {
+                        name: 'fake-lb-pool2-name',
+                        id: 'fake-lb-pool2-id'
+                      }
+                    ],
+                    frontend_ip_configurations: [
+                      {
+                        inbound_nat_rules: [{}, {}]
+                      }
+                    ]
+                  },
+                  {
+                    backend_address_pools: [
+                      # {
+                      #   name: 'fake-lb2-pool-1-name',
+                      #   id: 'fake-lb2-pool-1-id'
+                      # },
+                      {
+                        name: 'fake-lb2-pool-2-name',
+                        id: 'fake-lb2-pool-2-id'
+                      }
+                    ],
+                    frontend_ip_configurations: [
+                      {
+                        inbound_nat_rules: [{}, {}]
+                      }
+                    ]
+                  }
+                ],
+                application_gateways: nil
+              }
+            end
+
+            let(:request_body) do
+              {
+                name: nic_params[:name],
+                location: nic_params[:location],
+                tags: {},
+                properties: {
+                  networkSecurityGroup: {
+                    id: nic_params[:network_security_group][:id]
+                  },
+                  enableIPForwarding: false,
+                  enableAcceleratedNetworking: false,
+                  ipConfigurations: [{
+                    name: nic_params[:ipconfig_name],
+                    properties: {
+                      privateIPAddress: nic_params[:private_ip],
+                      privateIPAllocationMethod: 'Static',
+                      publicIPAddress: { id: nic_params[:public_ip][:id] },
+                      subnet: {
+                        id: subnet[:id]
+                      },
+                      loadBalancerBackendAddressPools: [
+                        {
+                          id: 'fake-lb-pool2-id'
+                        },
+                        {
+                          id: 'fake-lb2-pool-2-id'
+                        }
+                      ],
+                      loadBalancerInboundNatRules: [{}]
+                    }
+                  }],
+                  dnsSettings: {
+                    dnsServers: ['168.63.129.16']
+                  }
+                }
+              }
+            end
+
+            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
+            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
+            it 'should use the specified backend_pools'
+            # it 'should use the specified backend_pools' do
+            #   expect do
+            #     azure_client.create_network_interface(resource_group, nic_params)
+            #   end.not_to raise_error
+            # end
           end
         end
       end
