@@ -426,15 +426,8 @@ describe Bosh::AzureCloud::AzureClient do
                       subnet: {
                         id: subnet[:id]
                       },
-                      loadBalancerBackendAddressPools: [
-                        {
-                          id: 'fake-lb-pool-id'
-                        },
-                        {
-                          id: 'fake-lb-pool2-id'
-                        }
-                      ],
-                      loadBalancerInboundNatRules: [{}]
+                      loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                      loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                     }
                   }],
                   dnsSettings: {
@@ -444,14 +437,11 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
-            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
-            it 'should use the default backend_pools'
-            # it 'should use the default backend_pools' do
-            #   expect do
-            #     azure_client.create_network_interface(resource_group, nic_params)
-            #   end.not_to raise_error
-            # end
+            it 'should use the default backend_pools' do
+              expect do
+                azure_client.create_network_interface(resource_group, nic_params)
+              end.not_to raise_error
+            end
           end
 
           context 'when backend_pool_name is specified' do
@@ -512,15 +502,8 @@ describe Bosh::AzureCloud::AzureClient do
                       subnet: {
                         id: subnet[:id]
                       },
-                      loadBalancerBackendAddressPools: [
-                        {
-                          id: 'fake-lb-pool-id'
-                        },
-                        {
-                          id: 'fake-lb-pool2-id'
-                        }
-                      ],
-                      loadBalancerInboundNatRules: [{}]
+                      loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                      loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                     }
                   }],
                   dnsSettings: {
@@ -530,14 +513,11 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
-            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
-            it 'should use the specified backend_pools'
-            # it 'should use the specified backend_pools' do
-            #   expect do
-            #     azure_client.create_network_interface(resource_group, nic_params)
-            #   end.not_to raise_error
-            # end
+            it 'should use the specified backend_pools' do
+              expect do
+                azure_client.create_network_interface(resource_group, nic_params)
+              end.not_to raise_error
+            end
           end
         end
 
@@ -640,15 +620,8 @@ describe Bosh::AzureCloud::AzureClient do
                     subnet: {
                       id: subnet[:id]
                     },
-                    loadBalancerBackendAddressPools: [
-                      {
-                        id: 'fake-lb-pool-id'
-                      },
-                      {
-                        id: 'fake-lb2-pool-1-id'
-                      }
-                    ],
-                    loadBalancerInboundNatRules: [{}]
+                    loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                    loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                   }
                 }],
                 dnsSettings: {
@@ -658,14 +631,11 @@ describe Bosh::AzureCloud::AzureClient do
             }
           end
 
-          # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
-          #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
-          it 'should create a network interface without error'
-          # it 'should create a network interface without error' do
-          #   expect do
-          #     azure_client.create_network_interface(resource_group, nic_params)
-          #   end.not_to raise_error
-          # end
+          it 'should create a network interface without error' do
+            expect do
+              azure_client.create_network_interface(resource_group, nic_params)
+            end.not_to raise_error
+          end
         end
 
         context 'with multiple backend pools' do
@@ -744,15 +714,8 @@ describe Bosh::AzureCloud::AzureClient do
                       subnet: {
                         id: subnet[:id]
                       },
-                      loadBalancerBackendAddressPools: [
-                        {
-                          id: 'fake-lb-pool-id'
-                        },
-                        {
-                          id: 'fake-lb2-pool-1-id'
-                        }
-                      ],
-                      loadBalancerInboundNatRules: [{}]
+                      loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                      loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                     }
                   }],
                   dnsSettings: {
@@ -762,14 +725,11 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
-            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
-            it 'should use the default backend_pools'
-            # it 'should use the default backend_pools' do
-            #   expect do
-            #     azure_client.create_network_interface(resource_group, nic_params)
-            #   end.not_to raise_error
-            # end
+            it 'should use the default backend_pools' do
+              expect do
+                azure_client.create_network_interface(resource_group, nic_params)
+              end.not_to raise_error
+            end
           end
 
           context 'when backend_pool_name is specified' do
@@ -849,15 +809,8 @@ describe Bosh::AzureCloud::AzureClient do
                       subnet: {
                         id: subnet[:id]
                       },
-                      loadBalancerBackendAddressPools: [
-                        {
-                          id: 'fake-lb-pool2-id'
-                        },
-                        {
-                          id: 'fake-lb2-pool-2-id'
-                        }
-                      ],
-                      loadBalancerInboundNatRules: [{}]
+                      loadBalancerBackendAddressPools: nic_params[:load_balancers].map { |lb| { :id => lb[:backend_address_pools][0][:id] } },
+                      loadBalancerInboundNatRules: nic_params[:load_balancers].flat_map { |lb| lb[:frontend_ip_configurations][0][:inbound_nat_rules] }.compact
                     }
                   }],
                   dnsSettings: {
@@ -867,14 +820,11 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            # NOTE: issue-644: rspec output truncation: this spec is failing, but RSpec is truncating the output, making it difficult to fix the failure.
-            #     > expected no Exception, got #<WebMock::NetConnectNotAllowedError: Real HTTP connections are disabled. Unregistered request: PUT https://management.azure.com/subscriptions/aa643f05-5b67-4d58-b433-54c2e9131a59/resourceGroups/fake-resource-group-name/providers/Microsoft.Network/net...ns[0].properties.loadBalancerInboundNatRules[0]",
-            it 'should use the specified backend_pools'
-            # it 'should use the specified backend_pools' do
-            #   expect do
-            #     azure_client.create_network_interface(resource_group, nic_params)
-            #   end.not_to raise_error
-            # end
+            it 'should use the specified backend_pools' do
+              expect do
+                azure_client.create_network_interface(resource_group, nic_params)
+              end.not_to raise_error
+            end
           end
         end
       end
