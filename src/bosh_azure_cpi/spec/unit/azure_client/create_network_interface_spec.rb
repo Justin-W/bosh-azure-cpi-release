@@ -965,8 +965,7 @@ describe Bosh::AzureCloud::AzureClient do
         end
       end
 
-      # NOTE: issue-644: unit tests for single-AGW, single-pool
-      context 'with application gateway' do
+      context 'with single application gateway' do
         before do
           stub_request(:post, token_uri).to_return(
             status: 200,
