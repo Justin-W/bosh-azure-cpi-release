@@ -983,11 +983,7 @@ describe Bosh::AzureCloud::AzureClient do
                     subnet: {
                       id: subnet[:id]
                     },
-                    applicationGatewayBackendAddressPools: [
-                      {
-                        id: 'fake-agw-pool-id'
-                      }
-                    ]
+                    applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
                   }
                 }],
                 dnsSettings: {
@@ -1234,14 +1230,7 @@ describe Bosh::AzureCloud::AzureClient do
                     subnet: {
                       id: subnet[:id]
                     },
-                    applicationGatewayBackendAddressPools: [
-                      {
-                        id: 'fake-agw-pool-id'
-                      },
-                      {
-                        id: 'fake-agw2-pool-1-id'
-                      }
-                    ]
+                    applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
                   }
                 }],
                 dnsSettings: {
@@ -1323,14 +1312,7 @@ describe Bosh::AzureCloud::AzureClient do
                       subnet: {
                         id: subnet[:id]
                       },
-                      applicationGatewayBackendAddressPools: [
-                        {
-                          id: 'fake-agw-pool-id'
-                        },
-                        {
-                          id: 'fake-agw2-pool-1-id'
-                        }
-                      ]
+                      applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
                     }
                   }],
                   dnsSettings: {
@@ -1413,14 +1395,7 @@ describe Bosh::AzureCloud::AzureClient do
                       subnet: {
                         id: subnet[:id]
                       },
-                      applicationGatewayBackendAddressPools: [
-                        {
-                          id: 'fake-agw-pool2-id'
-                        },
-                        {
-                          id: 'fake-agw2-pool-2-id'
-                        }
-                      ]
+                      applicationGatewayBackendAddressPools: nic_params[:application_gateways].map { |agw| { :id => agw[:backend_address_pools][0][:id] } }
                     }
                   }],
                   dnsSettings: {
