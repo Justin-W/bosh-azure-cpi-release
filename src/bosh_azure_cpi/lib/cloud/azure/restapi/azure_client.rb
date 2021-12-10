@@ -2080,15 +2080,18 @@ module Bosh::AzureCloud
           end
           interface[:load_balancers] = load_balancers
         end
-        # TODO: issue-644: multi-AGW: Add support for multiple ApplicationGateways
-        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple ApplicationGateway Backend Address Pools
-        unless ip_configuration_properties['applicationGatewayBackendAddressPools'].nil?
-          if recursive
-            names = _parse_name_from_id(ip_configuration_properties['applicationGatewayBackendAddressPools'][0]['id'])
-            interface[:application_gateway] = get_application_gateway_by_name(names[:resource_name], resource_group_name: names[:resource_group_name])
-          else
-            interface[:application_gateway] = { id: ip_configuration_properties['applicationGatewayBackendAddressPools'][0]['id'] }
+        application_gateway_backend_pools = ip_configuration_properties['applicationGatewayBackendAddressPools']
+        unless application_gateway_backend_pools.nil?
+          application_gateways = application_gateway_backend_pools.map do |agw_backend_pool|
+            if recursive
+              names = _parse_name_from_id(agw_backend_pool['id'])
+              application_gateway = get_application_gateway_by_name(names[:resource_name], resource_group_name: names[:resource_group_name])
+            else
+              application_gateway = { id: agw_backend_pool['id'] }
+            end
+            application_gateway
           end
+          interface[:application_gateways] = application_gateways
         end
         unless ip_configuration_properties['applicationSecurityGroups'].nil?
           asgs_properties = ip_configuration_properties['applicationSecurityGroups']
