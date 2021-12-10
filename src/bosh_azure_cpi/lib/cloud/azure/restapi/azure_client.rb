@@ -303,12 +303,7 @@ module Bosh::AzureCloud
         network_interfaces_params.push(
           'id' => network_interface[:id],
           'properties' => {
-            # TODO: issue-644: multi-AGW: Review: What is special/different about the first/primary NIC vs other NICs?
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L228
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/vms/vm_manager_network.rb#L185
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L12
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L60-L67
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L305
+            # NOTE: The first NIC is the Primary/Gateway network. See: `Bosh::AzureCloud::NetworkConfigurator.initialize`.
             'primary' => index.zero?
           }
         )
