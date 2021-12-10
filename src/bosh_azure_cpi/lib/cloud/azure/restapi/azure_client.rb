@@ -303,12 +303,7 @@ module Bosh::AzureCloud
         network_interfaces_params.push(
           'id' => network_interface[:id],
           'properties' => {
-            # TODO: issue-644: multi-AGW: Review: What is special/different about the first/primary NIC vs other NICs?
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L228
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/vms/vm_manager_network.rb#L185
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L12
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L60-L67
-            #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L305
+            # NOTE: The first NIC is the Primary/Gateway network. See: `Bosh::AzureCloud::NetworkConfigurator.initialize`.
             'primary' => index.zero?
           }
         )
@@ -1487,7 +1482,7 @@ module Bosh::AzureCloud
       # see: Bosh::AzureCloud::VMManager._get_application_gateways
       application_gateways = nic_params[:application_gateways]
       unless application_gateways.nil?
-        # TODO: issue-644: multi-BEPool-AGW: Add support for multiple (named) ApplicationGateway Backend Address Pools
+        # NOTE: backend_address_pools[0] should always be used. (When `application_gateway/backend_pool_name` is specified, the named pool will always be first here.)
         backend_pools = application_gateways.map { |application_gateway| {:id => application_gateway[:backend_address_pools][0][:id]} }
         interface['properties']['ipConfigurations'][0]['properties']['applicationGatewayBackendAddressPools'] = backend_pools
       end
@@ -1550,8 +1545,6 @@ module Bosh::AzureCloud
     # @See https://docs.microsoft.com/en-us/rest/api/network/delete-a-network-interface-card
     #
     def delete_network_interface(resource_group_name, name)
-      # TODO: issue-644: multi-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateways?
-      # TODO: issue-644: multi-BEPool-AGW: Review: What needs to change here (and/or in callers of this method) to support multiple ApplicationGateway Backend Address Pools?
       @logger.debug("delete_network_interface - trying to delete #{name} from resource group #{resource_group_name}")
       url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES, resource_group_name: resource_group_name, name: name)
       http_delete(url)

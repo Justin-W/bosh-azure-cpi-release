@@ -219,12 +219,7 @@ module Bosh::AzureCloud
           enable_accelerated_networking: accelerated_networking
         }
         nic_params[:subnet] = _get_network_subnet(network)
-        # TODO: issue-644: multi-AGW: Review: Why are LB and AGW only initialized for the 'primary NIC' (i.e. index==0)?
-        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L228
-        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L12
-        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/network/network_configurator.rb#L60-L67
-        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/restapi/azure_client.rb#L305
-        #       see also: https://github.com/cloudfoundry/bosh-azure-cpi-release/blob/f50122304c0bde85123612225a7244923027075b/src/bosh_azure_cpi/lib/cloud/azure/vms/vm_manager_network.rb#L185
+        # NOTE: The first NIC is the Primary/Gateway network. See: `Bosh::AzureCloud::NetworkConfigurator.initialize`.
         if index.zero?
           nic_params[:public_ip] = public_ip
           nic_params[:tags] = primary_nic_tags

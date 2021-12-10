@@ -183,9 +183,10 @@ shared_context 'shared stuff for vm manager' do
     #     then the mock below would be needed to enable usable rspec stack traces.
     #     Without this mock, the output gives `... received unexpected message :list_network_interfaces_by_keyword with ...`
     #     which doesn't include the actual error which was raised. Not very useful when debugging spec failures.
-    # TODO: issue-644: Review: Uncommenting the mock below doesn't SEEM to harm anything,
+    #     Uncommenting the mock below doesn't SEEM to harm anything,
     #     even when the spec shared data is correct (and an error like the one mentioned above is NOT raised).
-    #     However, since I'm not CERTAIN it wouldn't cause problems, I've left it commented out for now.
+    #     However, since I'm not CERTAIN it wouldn't cause problems (e.g. if specific specs need a different return value),
+    #     I've left it commented out for now.
     # allow(azure_client).to receive(:list_network_interfaces_by_keyword)
     #   .with(MOCK_RESOURCE_GROUP_NAME, vm_name)
     #   .and_return([]) # .and_return(network_interfaces)
