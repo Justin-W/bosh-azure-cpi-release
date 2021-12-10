@@ -372,6 +372,79 @@ describe Bosh::AzureCloud::AzureClient do
 
         context 'with multiple backend pools' do
           context 'when backend_pool_name is not specified' do
+            let(:nic_params) do
+              {
+                name: nic_name,
+                location: 'fake-location',
+                ipconfig_name: 'fake-ipconfig-name',
+                subnet: { id: subnet[:id] },
+                tags: {},
+                enable_ip_forwarding: false,
+                enable_accelerated_networking: false,
+                private_ip: '10.0.0.100',
+                dns_servers: ['168.63.129.16'],
+                public_ip: { id: 'fake-public-id' },
+                network_security_group: { id: nsg_id },
+                application_security_groups: [],
+                load_balancers: [{
+                  backend_address_pools: [
+                    {
+                      name: 'fake-lb-pool-name',
+                      id: 'fake-lb-pool-id'
+                    },
+                    {
+                      name: 'fake-lb-pool2-name',
+                      id: 'fake-lb-pool2-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                }],
+                application_gateways: nil
+              }
+            end
+
+            let(:request_body) do
+              {
+                name: nic_params[:name],
+                location: nic_params[:location],
+                tags: {},
+                properties: {
+                  networkSecurityGroup: {
+                    id: nic_params[:network_security_group][:id]
+                  },
+                  enableIPForwarding: false,
+                  enableAcceleratedNetworking: false,
+                  ipConfigurations: [{
+                    name: nic_params[:ipconfig_name],
+                    properties: {
+                      privateIPAddress: nic_params[:private_ip],
+                      privateIPAllocationMethod: 'Static',
+                      publicIPAddress: { id: nic_params[:public_ip][:id] },
+                      subnet: {
+                        id: subnet[:id]
+                      },
+                      loadBalancerBackendAddressPools: [
+                        {
+                          id: 'fake-lb-pool-id'
+                        },
+                        {
+                          id: 'fake-lb-pool2-id'
+                        }
+                      ],
+                      loadBalancerInboundNatRules: [{}]
+                    }
+                  }],
+                  dnsSettings: {
+                    dnsServers: ['168.63.129.16']
+                  }
+                }
+              }
+            end
+
             # TODO: issue-644: multi-BEPool-LB: add unit tests for multi-pool LBs
             it 'should use the default backend_pools'
           end
