@@ -1228,6 +1228,31 @@ describe Bosh::AzureCloud::AzureClient do
       end
 
       context 'with multiple application gateways' do # rubocop:disable RSpec/RepeatedExampleGroupBody
+        before do
+          stub_request(:post, token_uri).to_return(
+            status: 200,
+            body: {
+              'access_token' => valid_access_token,
+              'expires_on' => expires_on
+            }.to_json,
+            headers: {}
+          )
+          stub_request(:put, network_interface_uri)
+            .with(body: request_body.to_json)
+            .to_return(
+              status: 200,
+              body: '',
+              headers: {
+                'azure-asyncoperation' => operation_status_link
+              }
+            )
+          stub_request(:get, operation_status_link).to_return(
+            status: 200,
+            body: '{"status":"Succeeded"}',
+            headers: {}
+          )
+        end
+
         context 'with single backend pool' do
           let(:nic_params) do
             {
