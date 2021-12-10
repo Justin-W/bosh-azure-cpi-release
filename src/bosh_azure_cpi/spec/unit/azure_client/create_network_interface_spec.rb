@@ -549,8 +549,10 @@ describe Bosh::AzureCloud::AzureClient do
       end
 
       context 'with multiple load balancers' do # rubocop:disable RSpec/RepeatedExampleGroupBody
-        # TODO: issue-644: multi-LB: add unit tests for multi-LBs
-        it 'should create a network interface without error'
+        context 'with single backend pool' do
+          # TODO: issue-644: multi-LB: add unit tests for multi-LBs
+          it 'should create a network interface without error'
+        end
 
         context 'with multiple backend pools' do
           # TODO: issue-644: multi-BEPool-LB: add unit tests for multi-pool LBs
