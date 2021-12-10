@@ -560,8 +560,15 @@ describe Bosh::AzureCloud::AzureClient do
         end
 
         context 'with multiple backend pools' do
-          # TODO: issue-644: multi-BEPool-LB: add unit tests for multi-pool LBs
-          it 'should create a network interface without error'
+          context 'when backend_pool_name is not specified' do
+            # TODO: issue-644: multi-BEPool-LB: add unit tests for multi-pool LBs
+            it 'should use the default backend_pools'
+            # it 'should use the default backend_pools' do
+            #   expect do
+            #     azure_client.create_network_interface(resource_group, nic_params)
+            #   end.not_to raise_error
+            # end
+          end
 
           context 'when backend_pool_name is specified' do
             # TODO: issue-644: multi-BEPool-LB: add unit tests for named-pool LBs
