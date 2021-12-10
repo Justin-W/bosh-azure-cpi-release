@@ -1415,13 +1415,11 @@ describe Bosh::AzureCloud::AzureClient do
               }
             end
 
-            # TODO: issue-644: multi-BEPool-AGW: add unit tests for multi-pool AGWs
-            it 'should use the default backend_pools'
-            # it 'should use the default backend_pools' do
-            #   expect do
-            #     azure_client.create_network_interface(resource_group, nic_params)
-            #   end.not_to raise_error
-            # end
+            it 'should use the default backend_pools' do
+              expect do
+                azure_client.create_network_interface(resource_group, nic_params)
+              end.not_to raise_error
+            end
           end
 
           context 'when backend_pool_name is specified' do
