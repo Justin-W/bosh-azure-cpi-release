@@ -550,6 +550,52 @@ describe Bosh::AzureCloud::AzureClient do
 
       context 'with multiple load balancers' do # rubocop:disable RSpec/RepeatedExampleGroupBody
         context 'with single backend pool' do
+          let(:nic_params) do
+            {
+              name: nic_name,
+              location: 'fake-location',
+              ipconfig_name: 'fake-ipconfig-name',
+              subnet: { id: subnet[:id] },
+              tags: {},
+              enable_ip_forwarding: false,
+              enable_accelerated_networking: false,
+              private_ip: '10.0.0.100',
+              dns_servers: ['168.63.129.16'],
+              public_ip: { id: 'fake-public-id' },
+              network_security_group: { id: nsg_id },
+              application_security_groups: [],
+              load_balancers: [
+                {
+                  backend_address_pools: [
+                    {
+                      name: 'fake-lb-pool-name',
+                      id: 'fake-lb-pool-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                },
+                {
+                  backend_address_pools: [
+                    {
+                      name: 'fake-lb2-pool-1-name',
+                      id: 'fake-lb2-pool-1-id'
+                    }
+                  ],
+                  frontend_ip_configurations: [
+                    {
+                      inbound_nat_rules: [{}, {}]
+                    }
+                  ]
+                }
+              ],
+              application_gateways: nil
+            }
+          end
+
           # TODO: issue-644: multi-LB: add unit tests for multi-LBs
           it 'should create a network interface without error'
           # it 'should create a network interface without error' do
