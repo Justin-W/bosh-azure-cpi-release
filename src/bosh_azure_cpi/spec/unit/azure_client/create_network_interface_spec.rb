@@ -1289,6 +1289,42 @@ describe Bosh::AzureCloud::AzureClient do
               ]
             }
           end
+          let(:request_body) do
+            {
+              name: nic_params[:name],
+              location: nic_params[:location],
+              tags: {},
+              properties: {
+                networkSecurityGroup: {
+                  id: nic_params[:network_security_group][:id]
+                },
+                enableIPForwarding: false,
+                enableAcceleratedNetworking: false,
+                ipConfigurations: [{
+                  name: nic_params[:ipconfig_name],
+                  properties: {
+                    privateIPAddress: nic_params[:private_ip],
+                    privateIPAllocationMethod: 'Static',
+                    publicIPAddress: { id: nic_params[:public_ip][:id] },
+                    subnet: {
+                      id: subnet[:id]
+                    },
+                    applicationGatewayBackendAddressPools: [
+                      {
+                        id: 'fake-agw-pool-id'
+                      },
+                      {
+                        id: 'fake-agw2-pool-1-id'
+                      }
+                    ]
+                  }
+                }],
+                dnsSettings: {
+                  dnsServers: ['168.63.129.16']
+                }
+              }
+            }
+          end
 
           # TODO: issue-644: multi-AGW: add unit tests for multi-AGWs
           it 'should create a network interface without error'
