@@ -552,6 +552,11 @@ describe Bosh::AzureCloud::AzureClient do
         context 'with single backend pool' do
           # TODO: issue-644: multi-LB: add unit tests for multi-LBs
           it 'should create a network interface without error'
+          # it 'should create a network interface without error' do
+          #   expect do
+          #     azure_client.create_network_interface(resource_group, nic_params)
+          #   end.not_to raise_error
+          # end
         end
 
         context 'with multiple backend pools' do
