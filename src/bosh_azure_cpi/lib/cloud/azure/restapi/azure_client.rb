@@ -1951,6 +1951,7 @@ module Bosh::AzureCloud
 
     private
 
+    # @return [Hash]
     def _parse_name_from_id(id)
       ret = id.match('/subscriptions/([^/]*)/resourceGroups/([^/]*)/providers/([^/]*)/([^/]*)/([^/]*)(.*)')
       raise AzureError, "\"#{id}\" is not a valid URL." if ret.nil?
@@ -1964,6 +1965,7 @@ module Bosh::AzureCloud
       result
     end
 
+    # @return [Hash, nil]
     def parse_vm_size(result)
       vm_size = nil
       unless result.nil?
@@ -1975,6 +1977,7 @@ module Bosh::AzureCloud
       vm_size
     end
 
+    # @return [Hash, nil]
     def parse_managed_disk(result)
       managed_disk = nil
       unless result.nil?
@@ -1993,6 +1996,7 @@ module Bosh::AzureCloud
       managed_disk
     end
 
+    # @return [Hash, nil]
     def parse_user_image(result)
       user_image = nil
       unless result.nil?
@@ -2007,6 +2011,7 @@ module Bosh::AzureCloud
       user_image
     end
 
+    # @return [Hash, nil]
     def parse_platform_image(result)
       image = nil
       unless result.nil?
@@ -2018,6 +2023,7 @@ module Bosh::AzureCloud
       image
     end
 
+    # @return [Hash, nil]
     def parse_network_interface(result, recursive: true)
       interface = nil
       unless result.nil?
@@ -2102,6 +2108,7 @@ module Bosh::AzureCloud
       interface
     end
 
+    # @return [Hash, nil]
     def parse_subnet(result)
       subnet = nil
       unless result.nil?
@@ -2116,6 +2123,7 @@ module Bosh::AzureCloud
       subnet
     end
 
+    # @return [Hash, nil]
     def parse_public_ip(result)
       ip_address = nil
       unless result.nil?
@@ -2145,6 +2153,7 @@ module Bosh::AzureCloud
       ip_address
     end
 
+    # @return [Hash, nil]
     def parse_storage_account(result)
       storage_account = nil
       unless result.nil?
@@ -2164,6 +2173,7 @@ module Bosh::AzureCloud
       storage_account
     end
 
+    # @return [Boolean]
     def filter_credential_in_logs(uri)
       return true if !is_debug_mode(@azure_config) && uri.request_uri.include?('/listKeys')
 
@@ -2174,16 +2184,19 @@ module Bosh::AzureCloud
       Hash[hash.map { |k, v| [k, v.is_a?(Hash) ? redact_credentials(keys, v) : (keys.include?(k) ? '<redacted>' : v)] }]
     end
 
+    # @return [String]
     def redact_credentials_in_request_body(body)
       is_debug_mode(@azure_config) ? body.to_json : redact_credentials(CREDENTIAL_KEYWORD_LIST, body).to_json
     end
 
+    # @return [Object]
     def redact_credentials_in_response_body(body)
       is_debug_mode(@azure_config) ? body : redact_credentials(CREDENTIAL_KEYWORD_LIST, JSON.parse(body)).to_json
     rescue StandardError => e
       body
     end
 
+    # @return [Net::HTTP]
     def http(uri, use_ssl = true)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true && use_ssl
